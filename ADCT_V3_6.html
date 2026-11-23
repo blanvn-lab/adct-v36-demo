@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADCT V3.6 · Batch Operations</title>
+<style>:root{color-scheme:dark;--base:#080e19;--panel:#0e1726;--line:#223149;--ink:#edf4ff;--muted:#9bacc4;--blue:#87acff;--mint:#51e6ba;--red:#ff8a99;--amber:#f3c475;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 58% -25%,#1a2d56 0%,transparent 60%),var(--base);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px}button,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.4}button:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--blue);outline-offset:3px}[hidden]{display:none!important}
+.top{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 3.2vw;border-bottom:1px solid var(--line);background:#090f1adb;gap:24px}.brand{display:flex;gap:12px;align-items:center}.brand strong{display:block;font-size:21px;letter-spacing:.025em}.brand small{font:750 11px var(--mono);color:var(--mint);vertical-align:3px;margin-left:4px}.brand span{display:block;font-size:11px;color:var(--muted);margin-top:3px}.mark{width:34px;height:34px;display:grid;grid-template-columns:repeat(2,1fr);gap:4px;transform:rotate(12deg);padding:5px;border:1px solid #315d65;border-radius:8px}.mark i{background:#5bdbba;border-radius:2px}.mark i:nth-child(2){opacity:.4}.mark i:nth-child(3){opacity:.65}.top nav{display:flex;gap:6px;height:100%;align-items:center}.tab{background:none;border:1px solid transparent;color:var(--muted);border-radius:7px;padding:9px 13px;font-weight:650;white-space:nowrap}.tab:hover,.tab.selected{color:var(--ink);background:#16243a;border-color:#283d56}.environment,.pill{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}.environment{color:var(--muted);font-size:12px}.dot{display:inline-block;width:7px;height:7px;background:var(--mint);border-radius:50%;box-shadow:0 0 9px #51e6ba76}
+main{max-width:1660px;margin:auto;padding:29px 3.2vw 0}.heading{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:22px}h1,h2,p{margin:0}h1{font-size:clamp(28px,3vw,43px);letter-spacing:-.045em;line-height:1.13;margin:7px 0 10px;font-weight:740}h2{font-size:17px;line-height:1.22;letter-spacing:-.015em}.sub{color:var(--muted);line-height:1.55;font-size:13px}.sub span,.eyebrow span{margin:0 4px;color:#6684af}.eyebrow{display:block;color:#a4bdf0;font:650 10px var(--mono);letter-spacing:.1em}.controls{display:flex;align-items:end;gap:9px}.controls label span{display:block;color:var(--muted);font-size:11px;margin:0 0 5px 1px}select,.secondary,.primary{height:38px;border-radius:7px;font-weight:650;padding:0 11px;border:1px solid var(--line);white-space:nowrap}select,.secondary{background:#142036;color:var(--ink)}.primary{background:#68e7bf;color:#06241b;border-color:#68e7bf}.primary span{margin-right:5px}.primary:hover:not(:disabled){background:#91f2d6}.secondary:hover:not(:disabled){border-color:var(--blue)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:15px}.metric,.panel{background:linear-gradient(145deg,#111c2e,var(--panel) 62%);border:1px solid var(--line);border-radius:11px;min-width:0}.metric{padding:14px 16px}.metric>span{font:650 10px var(--mono);letter-spacing:.09em;color:#a4b9d9}.metric strong{display:block;font-size:30px;line-height:1.3;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:nowrap}.metric small{font:500 17px var(--mono);color:var(--muted)}.metric p{color:var(--muted);font-size:11px;margin-top:4px}.workbench{display:grid;grid-template-columns:minmax(205px,.85fr) minmax(385px,1.9fr) minmax(215px,.93fr);gap:13px;align-items:start}.stack{display:grid;gap:13px;min-width:0}.panel-title{padding:15px 15px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}.panel-title h2{margin-top:4px}.pill{background:#18263b;border:1px solid #283c56;color:#b3c5e1;border-radius:5px;padding:4px 6px;font:700 9px var(--mono);letter-spacing:.035em}.pass{color:var(--mint)!important}.fail{color:var(--red)!important}.waiting{color:var(--amber)!important}.running{color:var(--blue)!important}
+#file-list{padding:0 10px}.file{padding:10px 8px;border-top:1px solid #1f2c41;display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:8px;min-height:53px}.file.active{background:#172a48;box-shadow:inset 2px 0 #83aaff}.file .glyph{display:grid;place-items:center;width:25px;height:27px;border:1px solid #314663;background:#1d2c44;border-radius:5px;color:#a6c1ff;font:700 8px var(--mono)}.file b,.file small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.file b{font-size:12px}.file small{font:10px var(--mono);margin-top:4px;color:var(--muted)}.file .state{font:700 9px var(--mono);color:var(--muted)}.panel-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid #1f2c41;color:var(--muted);font-size:11px;min-height:38px}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr) minmax(8px,.35fr)) minmax(0,1fr);align-items:start;padding:8px 15px 5px;background:radial-gradient(ellipse at center,#15274366,transparent 70%)}.node{text-align:center;min-width:0;color:var(--muted);position:relative}.node b{width:39px;height:39px;display:grid;place-items:center;margin:0 auto 8px;border-radius:11px;border:1px solid #314564;background:#14233a;color:#8ba8d4;font-size:21px}.node span,.node small{display:block}.node span{font-size:11px;font-weight:700;color:var(--ink);line-height:1.2;min-height:26px}.node small{font:8px var(--mono);color:inherit;margin-top:1px}.node.active{color:var(--blue)}.node.active b{border-color:var(--blue);color:#dbe9ff;background:#1b3158;animation:pulse 1.6s ease-in-out infinite}.node.pass b{border-color:#397b6e;color:var(--mint);background:#112e32}.node.fail b{border-color:#a44b64;color:var(--red);background:#361e30}.node.waiting b{border-color:#8f713e;color:var(--amber);background:#2d271e}.connector{position:relative;display:block;height:2px;margin-top:19px;background:#2c4161;border-radius:5px}.connector.active{background:#385f9f}.connector.active:after{content:"";position:absolute;width:7px;height:7px;top:-2.5px;border-radius:50%;background:#93baff;box-shadow:0 0 9px #8db8ff;animation:travel 1.25s linear infinite}.connector.pass{background:#397b6e}.progress-row{display:flex;align-items:center;gap:9px;padding:11px 16px 14px;color:var(--blue);font:11px var(--mono)}.progress{height:5px;flex:1;border-radius:5px;background:#22334e;overflow:hidden}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7aa4fc,#63e9c0);transition:width .22s linear}
+.toggle{height:24px}.toggle[aria-pressed="false"] .dot{background:#8593a8;box-shadow:none}.log-head,.log-row{display:grid;grid-template-columns:62px 86px minmax(0,1fr);gap:8px;padding:7px 13px}.log-head{background:#132035;color:#a4b8d8;font:9px var(--mono);letter-spacing:.05em;border-top:1px solid #26384e;border-bottom:1px solid #273950}.terminal{overflow:hidden}#stream{height:242px;overflow:auto;background:#090f1b;overscroll-behavior:contain;scrollbar-color:#345473 #0a1321}.log-row{color:#d1ddf0;font:10px/1.45 var(--mono);border-bottom:1px solid #162237;overflow-wrap:anywhere}.log-row time{color:#8ba2c8}.log-row b{color:#aac2fa;font-weight:600}.log-row.event{animation:insert .25s ease-out}.log-row.fail{background:#251522}.log-empty,.empty{padding:19px 15px;color:var(--muted);line-height:1.5}.text-button{padding:0;background:none;border:none;color:#a9c5ff;font-size:11px;white-space:nowrap}.text-button:hover{text-decoration:underline}
+#decision{margin:0 12px;padding:12px;background:#131f33;border:1px solid #283e5d;border-radius:8px;min-height:83px}#decision.fail{background:#2d1a2a;border-color:#793a51}#decision.waiting{background:#2d251a;border-color:#745b35}#decision.pass{background:#102b2c;border-color:#306b5e}#decision strong{display:block;letter-spacing:.02em;font-size:18px}#decision p{margin-top:5px;font-size:12px;line-height:1.4;color:#c3d0e4}.actions{display:grid;gap:7px;padding:10px 12px 13px}.actions button{width:100%;font-size:12px}#approve.ready{animation:pulse 1.8s ease-in-out infinite}#check-list{list-style:none;margin:0;padding:0 14px 10px}.check{border-top:1px solid #213049;min-height:27px;display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:11px}.check b{font:700 9px var(--mono);color:#8fa5c4;white-space:nowrap}.check.active b,.file.active .state{animation:soft 1.3s ease-in-out infinite;color:var(--blue)}footer{display:flex;justify-content:space-between;gap:10px;padding:16px 0 19px;color:#93a7c5;font-size:11px}
+.evidence-grid,.portfolio-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.evidence-panel{overflow:hidden}.wide{grid-column:1/-1}.table-wrap{overflow:auto;max-height:390px}table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}th,td{text-align:left;padding:9px 13px;border-top:1px solid #223149}th{position:sticky;top:0;background:#142138;color:#abc0df;font-weight:650}td:last-child{white-space:normal}.num{font-family:var(--mono);text-align:right}.portfolio-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.domain{padding:17px}.domain h2{margin:12px 0 8px}.domain p{color:#c1cfe2;line-height:1.5;margin-bottom:14px}.domain>div{display:grid;grid-template-columns:63px 1fr;gap:7px;color:var(--muted);font-size:12px;line-height:1.55;padding-top:6px;border-top:1px solid var(--line);margin-top:6px}.domain b{color:#cbdbf5}
+@keyframes pulse{50%{box-shadow:0 0 18px #83aaff64;filter:brightness(1.19)}}@keyframes soft{50%{opacity:.56}}@keyframes travel{from{left:0}to{left:calc(100% - 6px)}}@keyframes insert{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1160px){.heading{align-items:start;flex-direction:column;gap:13px}.workbench{grid-template-columns:minmax(174px,.8fr) minmax(330px,1.65fr) minmax(185px,.82fr);gap:9px}.panel-title{padding-left:11px;padding-right:11px}.file{gap:5px}.file b{font-size:11px}}
+@media(max-width:900px){.workbench{grid-template-columns:minmax(175px,1fr) minmax(300px,1.9fr)}.workbench>.stack:last-child{grid-column:1/-1;grid-template-columns:1fr 1fr}.portfolio-grid{grid-template-columns:1fr 1fr}.environment{display:none}}
+@media(max-width:600px){.top{height:auto;padding:12px 4vw 8px;align-items:start;flex-direction:column;gap:8px}.tab{padding:7px 8px;font-size:12px}main{padding:19px 4vw 0}.heading{margin-bottom:15px}.controls{flex-wrap:wrap}.metrics{grid-template-columns:1fr 1fr;gap:7px}.metric{padding:10px}.metric strong{font-size:25px}.workbench,.portfolio-grid,.evidence-grid,.workbench>.stack:last-child{grid-template-columns:1fr}.workbench>.sources{grid-row:2}.workbench>.stack:last-child{grid-column:auto}.flow{padding-left:8px;padding-right:8px}footer{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*,*::after{animation:none!important;transition:none!important}}
+#variance-chart:not(:empty){padding:13px;border-top:1px solid var(--line)}.chart-title{font:650 9px var(--mono);letter-spacing:.08em;color:#a4b9d9;margin-bottom:9px}.chart-row{display:grid;grid-template-columns:52px minmax(40px,1fr) 76px;align-items:center;gap:9px;color:#c8d6ed;font:11px var(--mono);margin:7px 0}.chart-row span:last-child{text-align:right}.chart-track{height:6px;background:#233047;border-radius:6px;overflow:hidden}.chart-track i{display:block;height:100%;min-width:4px;background:var(--mint);border-radius:6px}.chart-track i.has-variance{background:var(--red)}
+.flow{display:block;position:relative;height:280px;background:radial-gradient(ellipse,#16324a 0%,transparent 65%)}.orbit{position:absolute;inset:0;width:100%;height:100%}.wire{fill:none;stroke:#375878;stroke-width:2}.wire.live{stroke:#72ffdc;stroke-width:3;stroke-dasharray:9 6;animation:beam .65s linear infinite;filter:drop-shadow(0 0 4px #4af9cf)}@keyframes beam{to{stroke-dashoffset:-30}}.flow .connector{display:none}.flow .node{position:absolute;transform:translate(-50%,-50%);width:90px}.flow .node span{min-height:0}.flow .node b{border-radius:50%;margin-bottom:3px}.flow .node.active b{animation:flare .78s ease-in-out infinite alternate;border-color:#96ffeb}.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center}.hub small,.hub strong{display:block;font-family:var(--mono)}.hub small{font-size:9px;color:#9eb5ca}.hub strong{margin-top:3px;color:#8cf4d6}@keyframes flare{from{box-shadow:0 0 6px #67ffe0}to{box-shadow:0 0 6px 2px #abffeb,0 0 21px 5px #39dcbf;background:#205456}}@media(prefers-reduced-motion:reduce){.flow .wire.live,.flow .node.active b{animation:none}}.flow [data-step="intake"]{left:50.0%;top:16.78571428571429%}.flow [data-step="scan"]{left:81.62262916681385%;top:39.73622125826068%}.flow [data-step="gate"]{left:69.54385963872474%;top:76.87092159888218%}.flow [data-step="triage"]{left:30.45614036127527%;top:76.87092159888219%}.flow [data-step="publish"]{left:18.37737083318614%;top:39.736221258260684%}.network{width:100%;display:block;background:radial-gradient(ellipse,#162a41,#0b1523 75%)}.route path{fill:none;stroke:#36536c;stroke-width:1}.route.live path{stroke:#53dfc9;stroke-width:1.6;stroke-dasharray:5 5}.marble{display:none}.live .marble{display:inline}.station circle{fill:#162b40;stroke:#446681;stroke-width:1.5}.station .core{fill:#819cb5}.station.active circle{stroke:#72ffe0;filter:drop-shadow(0 0 5px #51dcb6)}.station.active .core{fill:#dffff9;animation:soft .8s ease-in-out infinite}.station.pass .core{fill:#51e6ba}.station.fail .core{fill:#ff8098}.station.waiting .core{fill:#f5c47a}.station text{fill:#deeafa;text-anchor:middle;font:600 13px system-ui;paint-order:stroke;stroke:#101a28;stroke-width:4px}@media(prefers-reduced-motion:reduce){.live .marble{display:none}} .station[data-kind="source"] circle{stroke:#8876ab;fill:#322c49}.station[data-kind="source"] .core{fill:#c6acff}.station[data-kind="source"] text{font-size:11px;fill:#d6c9ed}.station[data-kind="source"].active circle{stroke:#daacff;filter:drop-shadow(0 0 5px #b984ff)}.station[data-kind="source"].fail .core{fill:#ff808c}.station[data-kind="source"].pass .core{fill:#66dec3}@media(min-width:901px){.metrics{grid-template-columns:repeat(5,minmax(0,1fr))}}#owner{font-size:clamp(16px,1.65vw,27px);white-space:normal}.network .station.fail circle{fill:#51192b!important;stroke:#ff8197!important;filter:none!important;animation:none!important}.network .station.fail .core{fill:#ff8197!important}.network .station .signal{font:bold 10px system-ui;fill:#ffe7ed}.network .station.fail .signal{fill:#ff9cad}.network .route:not(.live) .marble{display:none!important}</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div><strong>ADCT <small>V3.6</small></strong><span>AI Data Delivery Control Tower</span></div></div>
+  <nav aria-label="Màn hình">
+    <button class="tab selected" data-page="operations">Vận hành batch</button>
+    <button class="tab" data-page="evidence">Bằng chứng</button>
+    <button class="tab" data-page="portfolio">Phạm vi Data</button>
+  <button class="tab" data-page="delivery">Tiến độ team</button></nav>
+  <div class="environment"><i class="dot"></i> Dữ liệu giả lập</div>
+</header>
+<main>
+<section id="operations" class="page">
+  <div class="heading">
+    <div><p class="eyebrow">FINANCE &amp; RETAIL OPERATIONS <span> / </span> DATA-101</p><h1>Đối soát doanh thu cuối ngày</h1><p class="sub">Batch 22/11/2026 <span>·</span> Giờ công bố 07:00 ICT <span>·</span> 24 nhà thuốc</p></div>
+    <div class="controls">
+      <label><span>Kịch bản</span><select id="scenario"><option value="mismatch">Lệch doanh thu LC002</option><option value="clean">Batch chuẩn</option><option value="missing">Thiếu file POS North</option><option value="late">ERP đến trễ</option></select></label>
+      <label><span>Nhịp hiển thị</span><select id="pace"><option value="present">Trình diễn</option><option value="fast">Nhanh</option></select></label>
+      <button class="primary" id="run" type="button"><span aria-hidden="true">▶</span> Chạy batch</button>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><span>FILE ĐÃ ĐỌC</span><strong id="file-count">0 <small>/ 9</small></strong><p>6 POS · ERP · Master · Control</p></div>
+    <div class="metric"><span>BẢN GHI ĐÃ QUÉT</span><strong id="record-count">0 <small>/ 1496</small></strong><p>Giao dịch, danh mục và đối soát</p></div>
+    <div class="metric"><span>QUALITY GATE</span><strong id="rule-count">— <small>/ 8</small></strong><p>6 rule V2 + 2 rule V3</p></div>
+    <div class="metric"><span>CHÊNH LỆCH</span><strong id="variance">—</strong><p>Tổng lệch tuyệt đối theo nhà thuốc</p></div>
+    <div class="metric"><span>INCIDENT OWNER</span><strong id="owner">—</strong><p id="owner-note">Chưa có sự cố</p></div>
+  </div>
+  <div class="workbench">
+    <section class="panel sources">
+      <div class="panel-title"><div><span class="eyebrow">01 / INGESTION</span><h2>Nguồn dữ liệu</h2></div><span class="pill" id="source-summary">9 FILE</span></div>
+      <div id="file-list"></div>
+      <div class="panel-foot">CSV cục bộ · Số dòng và trạng thái cập nhật khi đọc.</div>
+    </section>
+    <div class="stack">
+      <section class="panel pipeline">
+        <div class="panel-title"><div><span class="eyebrow">02 / EXECUTION</span><h2>Live Execution Graph</h2></div><span id="run-status" class="pill">STANDBY</span></div>
+        <svg class="network" viewBox="0 0 640 400" aria-label="Delivery stages and data sources"><ellipse cx="320" cy="194" rx="246" ry="130" fill="none" stroke="#263e58" opacity=".65" transform="rotate(21 320 194)"/><ellipse cx="320" cy="194" rx="246" ry="130" fill="none" stroke="#263e58" opacity=".65" transform="rotate(-21 320 194)"/><ellipse cx="320" cy="194" rx="246" ry="130" fill="none" stroke="#263e58" opacity=".65" transform="rotate(0 320 194)"/><g data-to="ba" class="route"><path d="M105 124 Q222.5 120.25999999999999 316 49"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M105 124 Q222.5 120.25999999999999 316 49"/></g></g><g data-to="scan" class="route"><path d="M316 49 Q412.3 118.4 531 119"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M316 49 Q412.3 118.4 531 119"/></g></g><g data-to="CTRL" class="route"><path d="M531 119 Q361.94 87.5 206 160"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M531 119 Q361.94 87.5 206 160"/></g></g><g data-to="gate" class="route" data-from="CTRL"><path d="M206 160 Q353.86 264.64 535 264"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M206 160 Q353.86 264.64 535 264"/></g></g><g data-to="MASTER" class="route"><path d="M531 119 Q401.4 83.03999999999999 275 129"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M531 119 Q401.4 83.03999999999999 275 129"/></g></g><g data-to="gate" class="route" data-from="MASTER"><path d="M275 129 Q383.4 238.1 535 264"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M275 129 Q383.4 238.1 535 264"/></g></g><g data-to="ERP" class="route"><path d="M531 119 Q446.4 97.44 365 129"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M531 119 Q446.4 97.44 365 129"/></g></g><g data-to="gate" class="route" data-from="ERP"><path d="M365 129 Q428.4 223.7 535 264"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M365 129 Q428.4 223.7 535 264"/></g></g><g data-to="POS-S" class="route"><path d="M531 119 Q475.94 123.98 434 160"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M531 119 Q475.94 123.98 434 160"/></g></g><g data-to="gate" class="route" data-from="POS-S"><path d="M434 160 Q467.86 228.16 535 264"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M434 160 Q467.86 228.16 535 264"/></g></g><g data-to="POS-C" class="route"><path d="M531 119 Q476.58 149.54 450 206"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M531 119 Q476.58 149.54 450 206"/></g></g><g data-to="gate" class="route" data-from="POS-C"><path d="M450 206 Q483.22 248.6 535 264"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M450 206 Q483.22 248.6 535 264"/></g></g><g data-to="POS-N" class="route"><path d="M531 119 Q447.52 162.84 405 247"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M531 119 Q447.52 162.84 405 247"/></g></g><g data-to="gate" class="route" data-from="POS-N"><path d="M405 247 Q467.28 276.3 535 264"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M405 247 Q467.28 276.3 535 264"/></g></g><g data-to="POS-S2" class="route"><path d="M531 119 Q402.46 157.24 320 263"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M531 119 Q402.46 157.24 320 263"/></g></g><g data-to="gate" class="route" data-from="POS-S2"><path d="M320 263 Q427.34 297.9 535 264"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M320 263 Q427.34 297.9 535 264"/></g></g><g data-to="POS-C2" class="route"><path d="M531 119 Q362.52 135.64 235 247"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M531 119 Q362.52 135.64 235 247"/></g></g><g data-to="gate" class="route" data-from="POS-C2"><path d="M235 247 Q382.28 303.5 535 264"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M235 247 Q382.28 303.5 535 264"/></g></g><g data-to="POS-N2" class="route"><path d="M531 119 Q346.58 107.94 190 206"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M531 119 Q346.58 107.94 190 206"/></g></g><g data-to="gate" class="route" data-from="POS-N2"><path d="M190 206 Q353.22 290.2 535 264"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M190 206 Q353.22 290.2 535 264"/></g></g><g data-to="triage" class="route"><path d="M535 264 Q417.5 267.74 324 339"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M535 264 Q417.5 267.74 324 339"/></g></g><g data-to="publish" class="route"><path d="M324 339 Q227.7 269.6 109 269"/><g class="marble"><circle r="5" fill="#72ffe2" opacity=".35"/><circle r="2.7" fill="#d9fff8"/><animateMotion dur="1.4s" repeatCount="indefinite" path="M324 339 Q227.7 269.6 109 269"/></g></g><g id="net-intake" data-kind="stage" class="station" transform="translate(105 124)"><circle r="22" style="fill:none;stroke:#426581;opacity:.45"/><circle r="17"/><circle class="core" r="5"/><text y="33">Intake</text><text class="signal" id="sig-intake" y="-24"></text></g><g id="net-ba" data-kind="stage" class="station" transform="translate(316 49)"><circle r="22" style="fill:none;stroke:#426581;opacity:.45"/><circle r="17"/><circle class="core" r="5"/><text y="33">BA / Plan</text><text class="signal" id="sig-ba" y="-24"></text></g><g id="net-scan" data-kind="stage" class="station" transform="translate(531 119)"><circle r="22" style="fill:none;stroke:#426581;opacity:.45"/><circle r="17"/><circle class="core" r="5"/><text y="33">Data Engineering</text><text class="signal" id="sig-scan" y="-24"></text></g><g id="net-gate" data-kind="stage" class="station" transform="translate(535 264)"><circle r="22" style="fill:none;stroke:#426581;opacity:.45"/><circle r="17"/><circle class="core" r="5"/><text y="33">Quality Gate</text><text class="signal" id="sig-gate" y="-24"></text></g><g id="net-triage" data-kind="stage" class="station" transform="translate(324 339)"><circle r="22" style="fill:none;stroke:#426581;opacity:.45"/><circle r="17"/><circle class="core" r="5"/><text y="33">Risk Triage</text><text class="signal" id="sig-triage" y="-24"></text></g><g id="net-publish" data-kind="stage" class="station" transform="translate(109 269)"><circle r="22" style="fill:none;stroke:#426581;opacity:.45"/><circle r="17"/><circle class="core" r="5"/><text y="33">QA / Publish</text><text class="signal" id="sig-publish" y="-24"></text></g><g id="net-CTRL" data-kind="source" class="station" transform="translate(206 160)"><circle r="9"/><circle class="core" r="3"/><text y="21">Batch Control</text><text class="signal" id="sig-CTRL" y="-14"></text></g><g id="net-MASTER" data-kind="source" class="station" transform="translate(275 129)"><circle r="9"/><circle class="core" r="3"/><text y="21">Branch Master</text><text class="signal" id="sig-MASTER" y="-14"></text></g><g id="net-ERP" data-kind="source" class="station" transform="translate(365 129)"><circle r="9"/><circle class="core" r="3"/><text y="21">ERP</text><text class="signal" id="sig-ERP" y="-14"></text></g><g id="net-POS-S" data-kind="source" class="station" transform="translate(434 160)"><circle r="9"/><circle class="core" r="3"/><text y="21">South AM</text><text class="signal" id="sig-POS-S" y="-14"></text></g><g id="net-POS-C" data-kind="source" class="station" transform="translate(450 206)"><circle r="9"/><circle class="core" r="3"/><text y="21">Central AM</text><text class="signal" id="sig-POS-C" y="-14"></text></g><g id="net-POS-N" data-kind="source" class="station" transform="translate(405 247)"><circle r="9"/><circle class="core" r="3"/><text y="21">North AM</text><text class="signal" id="sig-POS-N" y="-14"></text></g><g id="net-POS-S2" data-kind="source" class="station" transform="translate(320 263)"><circle r="9"/><circle class="core" r="3"/><text y="21">South PM</text><text class="signal" id="sig-POS-S2" y="-14"></text></g><g id="net-POS-C2" data-kind="source" class="station" transform="translate(235 247)"><circle r="9"/><circle class="core" r="3"/><text y="21">Central PM</text><text class="signal" id="sig-POS-C2" y="-14"></text></g><g id="net-POS-N2" data-kind="source" class="station" transform="translate(190 206)"><circle r="9"/><circle class="core" r="3"/><text y="21">North PM</text><text class="signal" id="sig-POS-N2" y="-14"></text></g></svg><div class="panel-foot">● Stage nghiệp vụ &nbsp; · &nbsp; <span style="color:#c6acff">● Nguồn CSV</span></div><span id="phase" hidden></span><div class="progress-row"><div class="progress" id="progress" role="progressbar" aria-label="Tiến độ quét" aria-valuemin="0" aria-valuemax="1496" aria-valuenow="0"><i></i></div><span id="progress-label">0%</span></div>
+      </section>
+      <section class="panel terminal">
+        <div class="panel-title"><div><span class="eyebrow">03 / LIVE ACTIVITY</span><h2>Dòng kiểm tra trực tiếp</h2></div><button id="follow" class="pill toggle" type="button" aria-pressed="true"><i class="dot"></i> Tự cuộn</button></div>
+        <div class="log-head"><span>THỜI GIAN</span><span>NGUỒN</span><span>SỰ KIỆN</span></div>
+        <div id="stream" tabindex="0" aria-label="Nhật ký thực thi"></div>
+        <div class="panel-foot"><span id="stream-info">Chờ chạy batch.</span><button class="text-button" data-page="evidence">Xem bằng chứng ↗</button></div>
+      </section>
+    </div>
+    <div class="stack">
+      <section class="panel decision">
+        <div class="panel-title"><div><span class="eyebrow">04 / RELEASE CONTROL</span><h2>Quyết định công bố</h2></div></div>
+        <div id="decision" aria-live="polite"></div>
+        <div class="actions"><label id="external-box" hidden>Nhận file POS North và chạy lại<input type="file" id="external-file" accept=".csv,text/csv"></label>
+          <button id="retry" class="secondary" type="button" disabled>Khôi phục mẫu &amp; chạy lại</button>
+          <button id="approve" class="primary" type="button" disabled>QA duyệt · GO</button>
+        </div>
+      </section>
+      <section class="panel gate">
+        <div class="panel-title"><div><span class="eyebrow">05 / EVIDENCE</span><h2>Quality checks</h2></div><span class="pill">8 RULE</span></div>
+        <ol id="check-list"></ol>
+      </section>
+    </div>
+  </div>
+</section>
+<section id="evidence" class="page" hidden>
+  <div class="heading"><div><p class="eyebrow">AUDIT TRAIL</p><h1>Bằng chứng thực thi</h1><p class="sub">Kết quả từng rule, đối soát chi nhánh và lịch sử lần chạy.</p></div><button class="secondary" id="export" disabled>Tải nhật ký CSV</button></div>
+  <div class="evidence-grid">
+    <section class="panel evidence-panel"><div class="panel-title"><h2>Lịch sử batch</h2></div><div id="history"></div><div id="variance-chart" aria-label="Xu hướng chênh lệch theo lần chạy"></div></section>
+    <section class="panel evidence-panel"><div class="panel-title"><h2>Kết quả từng rule</h2></div><div id="audit"></div></section>
+    <section class="panel evidence-panel wide"><div class="panel-title"><h2>Đối soát theo chi nhánh</h2><span class="pill">VND</span></div><div id="reconciliation"></div></section>
+  </div>
+</section>
+<section id="portfolio" class="page" hidden>
+  <div class="heading"><div><p class="eyebrow">DATA DEPARTMENT</p><h1>Phạm vi áp dụng</h1><p class="sub">Mở rộng cùng một cơ chế kiểm tra, xử lý ngoại lệ và lưu bằng chứng.</p></div></div>
+  <div class="portfolio-grid">
+    <article class="panel domain"><span class="pill pass">CHẠY TRONG V3</span><h2>Data Engineering &amp; Operations</h2><p>Nhận batch, kiểm số dòng và giờ nhận theo dữ liệu mẫu, định tuyến lỗi, chạy lại và giữ báo cáo nếu gate fail.</p><div><b>Owner</b> Data Engineering</div><div><b>Đo</b> Batch đúng hạn · Thời gian khôi phục</div></article>
+    <article class="panel domain"><span class="pill pass">CHẠY TRONG V3</span><h2>BI &amp; Finance</h2><p>Đối soát POS ↔ ERP theo nhà thuốc và duyệt mô phỏng trước khi công bố báo cáo doanh thu.</p><div><b>Owner</b> BI / Finance Data Owner</div><div><b>Đo</b> Lỗi lọt lên báo cáo · Thời gian đối soát</div></article>
+    <article class="panel domain"><span class="pill pass">CHẠY TRONG V3</span><h2>Data Quality &amp; Master Data</h2><p>Kiểm mã nhà thuốc, ID trùng, miền giá trị và lưu kết quả rule theo từng lần chạy.</p><div><b>Owner</b> Data Steward / Data Quality</div><div><b>Đo</b> Lỗi danh mục · Lỗi tái diễn</div></article>
+    <article class="panel domain"><span class="pill">PILOT ĐỀ XUẤT</span><h2>Supply Chain &amp; Inventory</h2><p>Kiểm snapshot tồn kho theo cửa hàng và SKU trước khi chuyển dữ liệu cho đội bổ sung hàng.</p><div><b>Điều kiện</b> Đủ snapshot · Mã SKU hợp lệ · Tồn âm ngoài chính sách</div><div><b>Owner</b> Supply Chain Data Owner</div></article>
+    <article class="panel domain"><span class="pill">PILOT ĐỀ XUẤT</span><h2>Data Science &amp; AI</h2><p>Giữ dữ liệu đầu vào cho forecast khi snapshot chưa đạt chuẩn. Tích hợp kiểm drift và chất lượng dự báo trước khi mở rộng.</p><div><b>Điều kiện</b> Đủ và đúng hạn · Ngưỡng drift · Backtest</div><div><b>Owner</b> DS / ML Lead</div></article>
+    <article class="panel domain"><span class="pill">PILOT ĐỀ XUẤT</span><h2>Delivery &amp; Governance</h2><p>Nối ticket, PR, CI, UAT và phê duyệt để DM thấy việc nào đang chờ, vì sao và do ai xử lý.</p><div><b>Điều kiện</b> Bằng chứng test · Quyền duyệt · Audit trail</div><div><b>Owner</b> Delivery Manager / QA Lead</div></article>
+  </div>
+</section>
+<section class="page" id="delivery" hidden><div class="heading"><div><p class="eyebrow">DELIVERY MANAGEMENT</p><h1>Tiến độ team</h1><p class="sub">Theo dõi bằng chứng theo từng mốc, người phụ trách và trở ngại cần xử lý.</p></div></div>
+<div class="controls"><label><span>Luồng công việc</span><select id="dm-lane"><option value="feature">Phát triển tính năng</option><option value="daily">Vận hành hằng ngày</option></select></label><label><span>Nguồn cập nhật</span><select id="dm-mode"><option value="demo">Sự kiện mẫu</option><option value="live">API local</option></select></label><button class="primary" id="dm-start">Bắt đầu theo dõi</button><span id="dm-connection">Sẵn sàng</span></div>
+<section class="panel" style="margin:16px 0;padding:16px"><h2 id="dm-title"></h2><p id="dm-target"></p><strong id="dm-summary"></strong><p id="dm-alert" aria-live="polite"></p></section>
+<div class="evidence-grid"><section class="panel"><div class="panel-title"><h2>Milestone</h2></div><div class="table-wrap"><table><thead><tr><th>Mốc</th><th>Trạng thái</th><th>Owner</th><th>Bằng chứng</th></tr></thead><tbody id="dm-stages"></tbody></table></div></section><section class="panel"><div class="panel-title"><h2>Nhật ký cập nhật · ICT</h2></div><div class="table-wrap"><table><thead><tr><th>Giờ nhận diện sự kiện</th><th>Nguồn</th><th>Cập nhật</th></tr></thead><tbody id="dm-events"></tbody></table></div></section></div></section><footer><span>ADCT V3.6 · Offline demo</span><span>Quy tắc chạy trên CSV mẫu · SLA nguồn, owner và QA trong kịch bản mô phỏng</span></footer>
+</main>
+<script type="application/json" id="fixtures">{"batch_control.csv": "file,expected_count,business_date,received_ict\npos_south.csv,240,2026-11-22,05:43\npos_central.csv,240,2026-11-22,05:47\npos_north.csv,240,2026-11-22,05:52\nerp_daily_totals.csv,24,2026-11-22,05:56\nbranch_master.csv,24,2026-11-22,05:35\npos_south_pm.csv,240,2026-11-22,05:43\npos_central_pm.csv,240,2026-11-22,05:47\npos_north_pm.csv,240,2026-11-22,05:52\n", "branch_master.csv": "branch_id,region\nLC001,SOUTH\nLC002,SOUTH\nLC003,SOUTH\nLC004,SOUTH\nLC005,SOUTH\nLC006,SOUTH\nLC007,SOUTH\nLC008,SOUTH\nLC009,CENTRAL\nLC010,CENTRAL\nLC011,CENTRAL\nLC012,CENTRAL\nLC013,CENTRAL\nLC014,CENTRAL\nLC015,CENTRAL\nLC016,CENTRAL\nLC017,NORTH\nLC018,NORTH\nLC019,NORTH\nLC020,NORTH\nLC021,NORTH\nLC022,NORTH\nLC023,NORTH\nLC024,NORTH\n", "erp_daily_totals.csv": "branch_id,total_vnd\nLC001,13856000\nLC002,12540000\nLC003,14324000\nLC004,14596000\nLC005,7396000\nLC006,7506000\nLC007,8450000\nLC008,7714000\nLC009,17368000\nLC010,17484000\nLC011,17836000\nLC012,17900000\nLC013,9182000\nLC014,9948000\nLC015,9390000\nLC016,11002000\nLC017,19196000\nLC018,22472000\nLC019,21252000\nLC020,22940000\nLC021,8374000\nLC022,6784000\nLC023,6942000\nLC024,7018000\n", "pos_central.csv": "order_id,branch_id,amount_vnd,status\nTX000161,LC009,362000,completed\nTX000162,LC009,89000,completed\nTX000163,LC009,226000,completed\nTX000164,LC009,363000,completed\nTX000165,LC009,90000,completed\nTX000166,LC009,227000,completed\nTX000167,LC009,364000,completed\nTX000168,LC009,91000,completed\nTX000169,LC009,228000,cancelled\nTX000170,LC009,365000,completed\nTX000171,LC009,92000,completed\nTX000172,LC009,229000,completed\nTX000173,LC009,366000,completed\nTX000174,LC009,93000,completed\nTX000175,LC009,230000,completed\nTX000176,LC009,367000,completed\nTX000177,LC009,94000,completed\nTX000178,LC009,231000,completed\nTX000179,LC009,368000,completed\nTX000180,LC009,95000,completed\nTX000181,LC010,232000,completed\nTX000182,LC010,369000,cancelled\nTX000183,LC010,96000,completed\nTX000184,LC010,233000,completed\nTX000185,LC010,370000,completed\nTX000186,LC010,97000,completed\nTX000187,LC010,234000,completed\nTX000188,LC010,371000,completed\nTX000189,LC010,98000,completed\nTX000190,LC010,235000,completed\nTX000191,LC010,372000,completed\nTX000192,LC010,99000,completed\nTX000193,LC010,236000,completed\nTX000194,LC010,373000,completed\nTX000195,LC010,100000,cancelled\nTX000196,LC010,237000,completed\nTX000197,LC010,374000,completed\nTX000198,LC010,101000,completed\nTX000199,LC010,238000,completed\nTX000200,LC010,375000,completed\nTX000201,LC011,102000,completed\nTX000202,LC011,239000,completed\nTX000203,LC011,376000,completed\nTX000204,LC011,103000,completed\nTX000205,LC011,240000,completed\nTX000206,LC011,377000,completed\nTX000207,LC011,104000,completed\nTX000208,LC011,241000,cancelled\nTX000209,LC011,378000,completed\nTX000210,LC011,105000,completed\nTX000211,LC011,242000,completed\nTX000212,LC011,379000,completed\nTX000213,LC011,106000,completed\nTX000214,LC011,243000,completed\nTX000215,LC011,380000,completed\nTX000216,LC011,107000,completed\nTX000217,LC011,244000,completed\nTX000218,LC011,381000,completed\nTX000219,LC011,108000,completed\nTX000220,LC011,245000,completed\nTX000221,LC012,382000,cancelled\nTX000222,LC012,109000,completed\nTX000223,LC012,246000,completed\nTX000224,LC012,383000,completed\nTX000225,LC012,110000,completed\nTX000226,LC012,247000,completed\nTX000227,LC012,384000,completed\nTX000228,LC012,111000,completed\nTX000229,LC012,248000,completed\nTX000230,LC012,385000,completed\nTX000231,LC012,112000,completed\nTX000232,LC012,249000,completed\nTX000233,LC012,386000,completed\nTX000234,LC012,113000,cancelled\nTX000235,LC012,250000,completed\nTX000236,LC012,387000,completed\nTX000237,LC012,114000,completed\nTX000238,LC012,251000,completed\nTX000239,LC012,388000,completed\nTX000240,LC012,115000,completed\nTX000241,LC013,252000,completed\nTX000242,LC013,389000,completed\nTX000243,LC013,116000,completed\nTX000244,LC013,253000,completed\nTX000245,LC013,390000,completed\nTX000246,LC013,117000,completed\nTX000247,LC013,254000,cancelled\nTX000248,LC013,391000,completed\nTX000249,LC013,118000,completed\nTX000250,LC013,255000,completed\nTX000251,LC013,392000,completed\nTX000252,LC013,119000,completed\nTX000253,LC013,256000,completed\nTX000254,LC013,393000,completed\nTX000255,LC013,120000,completed\nTX000256,LC013,257000,completed\nTX000257,LC013,394000,completed\nTX000258,LC013,121000,completed\nTX000259,LC013,258000,completed\nTX000260,LC013,395000,cancelled\nTX000261,LC014,122000,completed\nTX000262,LC014,259000,completed\nTX000263,LC014,396000,completed\nTX000264,LC014,123000,completed\nTX000265,LC014,260000,completed\nTX000266,LC014,397000,completed\nTX000267,LC014,124000,completed\nTX000268,LC014,261000,completed\nTX000269,LC014,398000,completed\nTX000270,LC014,125000,completed\nTX000271,LC014,262000,completed\nTX000272,LC014,399000,completed\nTX000273,LC014,126000,cancelled\nTX000274,LC014,263000,completed\nTX000275,LC014,400000,completed\nTX000276,LC014,127000,completed\nTX000277,LC014,264000,completed\nTX000278,LC014,401000,completed\nTX000279,LC014,128000,completed\nTX000280,LC014,265000,completed\nTX000281,LC015,402000,completed\nTX000282,LC015,129000,completed\nTX000283,LC015,266000,completed\nTX000284,LC015,403000,completed\nTX000285,LC015,130000,completed\nTX000286,LC015,267000,cancelled\nTX000287,LC015,404000,completed\nTX000288,LC015,131000,completed\nTX000289,LC015,268000,completed\nTX000290,LC015,405000,completed\nTX000291,LC015,132000,completed\nTX000292,LC015,269000,completed\nTX000293,LC015,406000,completed\nTX000294,LC015,133000,completed\nTX000295,LC015,270000,completed\nTX000296,LC015,407000,completed\nTX000297,LC015,134000,completed\nTX000298,LC015,271000,completed\nTX000299,LC015,408000,cancelled\nTX000300,LC015,135000,completed\nTX000301,LC016,272000,completed\nTX000302,LC016,409000,completed\nTX000303,LC016,136000,completed\nTX000304,LC016,273000,completed\nTX000305,LC016,410000,completed\nTX000306,LC016,137000,completed\nTX000307,LC016,274000,completed\nTX000308,LC016,411000,completed\nTX000309,LC016,138000,completed\nTX000310,LC016,275000,completed\nTX000311,LC016,412000,completed\nTX000312,LC016,139000,cancelled\nTX000313,LC016,276000,completed\nTX000314,LC016,413000,completed\nTX000315,LC016,140000,completed\nTX000316,LC016,277000,completed\nTX000317,LC016,414000,completed\nTX000318,LC016,141000,completed\nTX000319,LC016,278000,completed\nTX000320,LC016,415000,completed\nV32-central-1-160,LC009,362000,completed\nV32-central-1-161,LC009,89000,completed\nV32-central-1-162,LC009,226000,completed\nV32-central-1-163,LC009,363000,completed\nV32-central-1-164,LC009,90000,completed\nV32-central-1-165,LC009,227000,completed\nV32-central-1-166,LC009,364000,completed\nV32-central-1-167,LC009,91000,completed\nV32-central-1-168,LC009,228000,cancelled\nV32-central-1-169,LC009,365000,completed\nV32-central-1-170,LC009,92000,completed\nV32-central-1-171,LC009,229000,completed\nV32-central-1-172,LC009,366000,completed\nV32-central-1-173,LC009,93000,completed\nV32-central-1-174,LC009,230000,completed\nV32-central-1-175,LC009,367000,completed\nV32-central-1-176,LC009,94000,completed\nV32-central-1-177,LC009,231000,completed\nV32-central-1-178,LC009,368000,completed\nV32-central-1-179,LC009,95000,completed\nV32-central-1-180,LC010,232000,completed\nV32-central-1-181,LC010,369000,cancelled\nV32-central-1-182,LC010,96000,completed\nV32-central-1-183,LC010,233000,completed\nV32-central-1-184,LC010,370000,completed\nV32-central-1-185,LC010,97000,completed\nV32-central-1-186,LC010,234000,completed\nV32-central-1-187,LC010,371000,completed\nV32-central-1-188,LC010,98000,completed\nV32-central-1-189,LC010,235000,completed\nV32-central-1-190,LC010,372000,completed\nV32-central-1-191,LC010,99000,completed\nV32-central-1-192,LC010,236000,completed\nV32-central-1-193,LC010,373000,completed\nV32-central-1-194,LC010,100000,cancelled\nV32-central-1-195,LC010,237000,completed\nV32-central-1-196,LC010,374000,completed\nV32-central-1-197,LC010,101000,completed\nV32-central-1-198,LC010,238000,completed\nV32-central-1-199,LC010,375000,completed\nV32-central-1-200,LC011,102000,completed\nV32-central-1-201,LC011,239000,completed\nV32-central-1-202,LC011,376000,completed\nV32-central-1-203,LC011,103000,completed\nV32-central-1-204,LC011,240000,completed\nV32-central-1-205,LC011,377000,completed\nV32-central-1-206,LC011,104000,completed\nV32-central-1-207,LC011,241000,cancelled\nV32-central-1-208,LC011,378000,completed\nV32-central-1-209,LC011,105000,completed\nV32-central-1-210,LC011,242000,completed\nV32-central-1-211,LC011,379000,completed\nV32-central-1-212,LC011,106000,completed\nV32-central-1-213,LC011,243000,completed\nV32-central-1-214,LC011,380000,completed\nV32-central-1-215,LC011,107000,completed\nV32-central-1-216,LC011,244000,completed\nV32-central-1-217,LC011,381000,completed\nV32-central-1-218,LC011,108000,completed\nV32-central-1-219,LC011,245000,completed\nV32-central-1-220,LC012,382000,cancelled\nV32-central-1-221,LC012,109000,completed\nV32-central-1-222,LC012,246000,completed\nV32-central-1-223,LC012,383000,completed\nV32-central-1-224,LC012,110000,completed\nV32-central-1-225,LC012,247000,completed\nV32-central-1-226,LC012,384000,completed\nV32-central-1-227,LC012,111000,completed\nV32-central-1-228,LC012,248000,completed\nV32-central-1-229,LC012,385000,completed\nV32-central-1-230,LC012,112000,completed\nV32-central-1-231,LC012,249000,completed\nV32-central-1-232,LC012,386000,completed\nV32-central-1-233,LC012,113000,cancelled\nV32-central-1-234,LC012,250000,completed\nV32-central-1-235,LC012,387000,completed\nV32-central-1-236,LC012,114000,completed\nV32-central-1-237,LC012,251000,completed\nV32-central-1-238,LC012,388000,completed\nV32-central-1-239,LC012,115000,completed\n", "pos_north.csv": "order_id,branch_id,amount_vnd,status\nTX000321,LC017,142000,completed\nTX000322,LC017,279000,completed\nTX000323,LC017,416000,completed\nTX000324,LC017,143000,completed\nTX000325,LC017,280000,cancelled\nTX000326,LC017,417000,completed\nTX000327,LC017,144000,completed\nTX000328,LC017,281000,completed\nTX000329,LC017,418000,completed\nTX000330,LC017,145000,completed\nTX000331,LC017,282000,completed\nTX000332,LC017,419000,completed\nTX000333,LC017,146000,completed\nTX000334,LC017,283000,completed\nTX000335,LC017,420000,completed\nTX000336,LC017,147000,completed\nTX000337,LC017,284000,completed\nTX000338,LC017,421000,cancelled\nTX000339,LC017,148000,completed\nTX000340,LC017,285000,completed\nTX000341,LC018,422000,completed\nTX000342,LC018,149000,completed\nTX000343,LC018,286000,completed\nTX000344,LC018,423000,completed\nTX000345,LC018,150000,completed\nTX000346,LC018,287000,completed\nTX000347,LC018,424000,completed\nTX000348,LC018,151000,completed\nTX000349,LC018,288000,completed\nTX000350,LC018,425000,completed\nTX000351,LC018,152000,cancelled\nTX000352,LC018,289000,completed\nTX000353,LC018,426000,completed\nTX000354,LC018,153000,completed\nTX000355,LC018,290000,completed\nTX000356,LC018,427000,completed\nTX000357,LC018,154000,completed\nTX000358,LC018,291000,completed\nTX000359,LC018,428000,completed\nTX000360,LC018,155000,completed\nTX000361,LC019,292000,completed\nTX000362,LC019,429000,completed\nTX000363,LC019,156000,completed\nTX000364,LC019,293000,cancelled\nTX000365,LC019,430000,completed\nTX000366,LC019,157000,completed\nTX000367,LC019,294000,completed\nTX000368,LC019,431000,completed\nTX000369,LC019,158000,completed\nTX000370,LC019,295000,completed\nTX000371,LC019,432000,completed\nTX000372,LC019,159000,completed\nTX000373,LC019,296000,completed\nTX000374,LC019,433000,completed\nTX000375,LC019,160000,completed\nTX000376,LC019,297000,completed\nTX000377,LC019,434000,cancelled\nTX000378,LC019,161000,completed\nTX000379,LC019,298000,completed\nTX000380,LC019,435000,completed\nTX000381,LC020,162000,completed\nTX000382,LC020,299000,completed\nTX000383,LC020,436000,completed\nTX000384,LC020,163000,completed\nTX000385,LC020,300000,completed\nTX000386,LC020,437000,completed\nTX000387,LC020,164000,completed\nTX000388,LC020,301000,completed\nTX000389,LC020,438000,completed\nTX000390,LC020,165000,cancelled\nTX000391,LC020,302000,completed\nTX000392,LC020,439000,completed\nTX000393,LC020,166000,completed\nTX000394,LC020,303000,completed\nTX000395,LC020,440000,completed\nTX000396,LC020,167000,completed\nTX000397,LC020,304000,completed\nTX000398,LC020,441000,completed\nTX000399,LC020,168000,completed\nTX000400,LC020,305000,completed\nTX000401,LC021,442000,completed\nTX000402,LC021,169000,completed\nTX000403,LC021,306000,cancelled\nTX000404,LC021,443000,completed\nTX000405,LC021,170000,completed\nTX000406,LC021,307000,completed\nTX000407,LC021,444000,completed\nTX000408,LC021,171000,completed\nTX000409,LC021,308000,completed\nTX000410,LC021,35000,completed\nTX000411,LC021,172000,completed\nTX000412,LC021,309000,completed\nTX000413,LC021,36000,completed\nTX000414,LC021,173000,completed\nTX000415,LC021,310000,completed\nTX000416,LC021,37000,cancelled\nTX000417,LC021,174000,completed\nTX000418,LC021,311000,completed\nTX000419,LC021,38000,completed\nTX000420,LC021,175000,completed\nTX000421,LC022,312000,completed\nTX000422,LC022,39000,completed\nTX000423,LC022,176000,completed\nTX000424,LC022,313000,completed\nTX000425,LC022,40000,completed\nTX000426,LC022,177000,completed\nTX000427,LC022,314000,completed\nTX000428,LC022,41000,completed\nTX000429,LC022,178000,cancelled\nTX000430,LC022,315000,completed\nTX000431,LC022,42000,completed\nTX000432,LC022,179000,completed\nTX000433,LC022,316000,completed\nTX000434,LC022,43000,completed\nTX000435,LC022,180000,completed\nTX000436,LC022,317000,completed\nTX000437,LC022,44000,completed\nTX000438,LC022,181000,completed\nTX000439,LC022,318000,completed\nTX000440,LC022,45000,completed\nTX000441,LC023,182000,completed\nTX000442,LC023,319000,cancelled\nTX000443,LC023,46000,completed\nTX000444,LC023,183000,completed\nTX000445,LC023,320000,completed\nTX000446,LC023,47000,completed\nTX000447,LC023,184000,completed\nTX000448,LC023,321000,completed\nTX000449,LC023,48000,completed\nTX000450,LC023,185000,completed\nTX000451,LC023,322000,completed\nTX000452,LC023,49000,completed\nTX000453,LC023,186000,completed\nTX000454,LC023,323000,completed\nTX000455,LC023,50000,cancelled\nTX000456,LC023,187000,completed\nTX000457,LC023,324000,completed\nTX000458,LC023,51000,completed\nTX000459,LC023,188000,completed\nTX000460,LC023,325000,completed\nTX000461,LC024,52000,completed\nTX000462,LC024,189000,completed\nTX000463,LC024,326000,completed\nTX000464,LC024,53000,completed\nTX000465,LC024,190000,completed\nTX000466,LC024,327000,completed\nTX000467,LC024,54000,completed\nTX000468,LC024,191000,cancelled\nTX000469,LC024,328000,completed\nTX000470,LC024,55000,completed\nTX000471,LC024,192000,completed\nTX000472,LC024,329000,completed\nTX000473,LC024,56000,completed\nTX000474,LC024,193000,completed\nTX000475,LC024,330000,completed\nTX000476,LC024,57000,completed\nTX000477,LC024,194000,completed\nTX000478,LC024,331000,completed\nTX000479,LC024,58000,completed\nTX000480,LC024,195000,completed\nV32-north-1-160,LC017,142000,completed\nV32-north-1-161,LC017,279000,completed\nV32-north-1-162,LC017,416000,completed\nV32-north-1-163,LC017,143000,completed\nV32-north-1-164,LC017,280000,cancelled\nV32-north-1-165,LC017,417000,completed\nV32-north-1-166,LC017,144000,completed\nV32-north-1-167,LC017,281000,completed\nV32-north-1-168,LC017,418000,completed\nV32-north-1-169,LC017,145000,completed\nV32-north-1-170,LC017,282000,completed\nV32-north-1-171,LC017,419000,completed\nV32-north-1-172,LC017,146000,completed\nV32-north-1-173,LC017,283000,completed\nV32-north-1-174,LC017,420000,completed\nV32-north-1-175,LC017,147000,completed\nV32-north-1-176,LC017,284000,completed\nV32-north-1-177,LC017,421000,cancelled\nV32-north-1-178,LC017,148000,completed\nV32-north-1-179,LC017,285000,completed\nV32-north-1-180,LC018,422000,completed\nV32-north-1-181,LC018,149000,completed\nV32-north-1-182,LC018,286000,completed\nV32-north-1-183,LC018,423000,completed\nV32-north-1-184,LC018,150000,completed\nV32-north-1-185,LC018,287000,completed\nV32-north-1-186,LC018,424000,completed\nV32-north-1-187,LC018,151000,completed\nV32-north-1-188,LC018,288000,completed\nV32-north-1-189,LC018,425000,completed\nV32-north-1-190,LC018,152000,cancelled\nV32-north-1-191,LC018,289000,completed\nV32-north-1-192,LC018,426000,completed\nV32-north-1-193,LC018,153000,completed\nV32-north-1-194,LC018,290000,completed\nV32-north-1-195,LC018,427000,completed\nV32-north-1-196,LC018,154000,completed\nV32-north-1-197,LC018,291000,completed\nV32-north-1-198,LC018,428000,completed\nV32-north-1-199,LC018,155000,completed\nV32-north-1-200,LC019,292000,completed\nV32-north-1-201,LC019,429000,completed\nV32-north-1-202,LC019,156000,completed\nV32-north-1-203,LC019,293000,cancelled\nV32-north-1-204,LC019,430000,completed\nV32-north-1-205,LC019,157000,completed\nV32-north-1-206,LC019,294000,completed\nV32-north-1-207,LC019,431000,completed\nV32-north-1-208,LC019,158000,completed\nV32-north-1-209,LC019,295000,completed\nV32-north-1-210,LC019,432000,completed\nV32-north-1-211,LC019,159000,completed\nV32-north-1-212,LC019,296000,completed\nV32-north-1-213,LC019,433000,completed\nV32-north-1-214,LC019,160000,completed\nV32-north-1-215,LC019,297000,completed\nV32-north-1-216,LC019,434000,cancelled\nV32-north-1-217,LC019,161000,completed\nV32-north-1-218,LC019,298000,completed\nV32-north-1-219,LC019,435000,completed\nV32-north-1-220,LC020,162000,completed\nV32-north-1-221,LC020,299000,completed\nV32-north-1-222,LC020,436000,completed\nV32-north-1-223,LC020,163000,completed\nV32-north-1-224,LC020,300000,completed\nV32-north-1-225,LC020,437000,completed\nV32-north-1-226,LC020,164000,completed\nV32-north-1-227,LC020,301000,completed\nV32-north-1-228,LC020,438000,completed\nV32-north-1-229,LC020,165000,cancelled\nV32-north-1-230,LC020,302000,completed\nV32-north-1-231,LC020,439000,completed\nV32-north-1-232,LC020,166000,completed\nV32-north-1-233,LC020,303000,completed\nV32-north-1-234,LC020,440000,completed\nV32-north-1-235,LC020,167000,completed\nV32-north-1-236,LC020,304000,completed\nV32-north-1-237,LC020,441000,completed\nV32-north-1-238,LC020,168000,completed\nV32-north-1-239,LC020,305000,completed\n", "pos_south.csv": "order_id,branch_id,amount_vnd,status\nTX000001,LC001,172000,completed\nTX000002,LC001,309000,completed\nTX000003,LC001,36000,completed\nTX000004,LC001,173000,completed\nTX000005,LC001,310000,completed\nTX000006,LC001,37000,completed\nTX000007,LC001,174000,completed\nTX000008,LC001,311000,completed\nTX000009,LC001,38000,completed\nTX000010,LC001,175000,completed\nTX000011,LC001,312000,completed\nTX000012,LC001,39000,completed\nTX000013,LC001,176000,cancelled\nTX000014,LC001,313000,completed\nTX000015,LC001,40000,completed\nTX000016,LC001,177000,completed\nTX000017,LC001,314000,completed\nTX000018,LC001,41000,completed\nTX000019,LC001,178000,completed\nTX000020,LC001,315000,completed\nTX000021,LC002,42000,completed\nTX000022,LC002,179000,completed\nTX000023,LC002,316000,completed\nTX004,LC002,43000,completed\nTX000025,LC002,180000,completed\nTX000026,LC002,317000,cancelled\nTX000027,LC002,44000,completed\nTX000028,LC002,181000,completed\nTX000029,LC002,318000,completed\nTX000030,LC002,45000,completed\nTX000031,LC002,182000,completed\nTX000032,LC002,319000,completed\nTX000033,LC002,46000,completed\nTX000034,LC002,183000,completed\nTX000035,LC002,320000,completed\nTX000036,LC002,47000,completed\nTX000037,LC002,184000,completed\nTX000038,LC002,321000,completed\nTX000039,LC002,48000,cancelled\nTX000040,LC002,185000,completed\nTX000041,LC003,322000,completed\nTX000042,LC003,49000,completed\nTX000043,LC003,186000,completed\nTX000044,LC003,323000,completed\nTX000045,LC003,50000,completed\nTX000046,LC003,187000,completed\nTX000047,LC003,324000,completed\nTX000048,LC003,51000,completed\nTX000049,LC003,188000,completed\nTX000050,LC003,325000,completed\nTX000051,LC003,52000,completed\nTX000052,LC003,189000,cancelled\nTX000053,LC003,326000,completed\nTX000054,LC003,53000,completed\nTX000055,LC003,190000,completed\nTX000056,LC003,327000,completed\nTX000057,LC003,54000,completed\nTX000058,LC003,191000,completed\nTX000059,LC003,328000,completed\nTX000060,LC003,55000,completed\nTX000061,LC004,192000,completed\nTX000062,LC004,329000,completed\nTX000063,LC004,56000,completed\nTX000064,LC004,193000,completed\nTX000065,LC004,330000,cancelled\nTX000066,LC004,57000,completed\nTX000067,LC004,194000,completed\nTX000068,LC004,331000,completed\nTX000069,LC004,58000,completed\nTX000070,LC004,195000,completed\nTX000071,LC004,332000,completed\nTX000072,LC004,59000,completed\nTX000073,LC004,196000,completed\nTX000074,LC004,333000,completed\nTX000075,LC004,60000,completed\nTX000076,LC004,197000,completed\nTX000077,LC004,334000,completed\nTX000078,LC004,61000,cancelled\nTX000079,LC004,198000,completed\nTX000080,LC004,335000,completed\nTX000081,LC005,62000,completed\nTX000082,LC005,199000,completed\nTX000083,LC005,336000,completed\nTX000084,LC005,63000,completed\nTX000085,LC005,200000,completed\nTX000086,LC005,337000,completed\nTX000087,LC005,64000,completed\nTX000088,LC005,201000,completed\nTX000089,LC005,338000,completed\nTX000090,LC005,65000,completed\nTX000091,LC005,202000,cancelled\nTX000092,LC005,339000,completed\nTX000093,LC005,66000,completed\nTX000094,LC005,203000,completed\nTX000095,LC005,340000,completed\nTX000096,LC005,67000,completed\nTX000097,LC005,204000,completed\nTX000098,LC005,341000,completed\nTX000099,LC005,68000,completed\nTX000100,LC005,205000,completed\nTX000101,LC006,342000,completed\nTX000102,LC006,69000,completed\nTX000103,LC006,206000,completed\nTX000104,LC006,343000,cancelled\nTX000105,LC006,70000,completed\nTX000106,LC006,207000,completed\nTX000107,LC006,344000,completed\nTX000108,LC006,71000,completed\nTX000109,LC006,208000,completed\nTX000110,LC006,345000,completed\nTX000111,LC006,72000,completed\nTX000112,LC006,209000,completed\nTX000113,LC006,346000,completed\nTX000114,LC006,73000,completed\nTX000115,LC006,210000,completed\nTX000116,LC006,347000,completed\nTX000117,LC006,74000,cancelled\nTX000118,LC006,211000,completed\nTX000119,LC006,348000,completed\nTX000120,LC006,75000,completed\nTX000121,LC007,212000,completed\nTX000122,LC007,349000,completed\nTX000123,LC007,76000,completed\nTX000124,LC007,213000,completed\nTX000125,LC007,350000,completed\nTX000126,LC007,77000,completed\nTX000127,LC007,214000,completed\nTX000128,LC007,351000,completed\nTX000129,LC007,78000,completed\nTX000130,LC007,215000,cancelled\nTX000131,LC007,352000,completed\nTX000132,LC007,79000,completed\nTX000133,LC007,216000,completed\nTX000134,LC007,353000,completed\nTX000135,LC007,80000,completed\nTX000136,LC007,217000,completed\nTX000137,LC007,354000,completed\nTX000138,LC007,81000,completed\nTX000139,LC007,218000,completed\nTX000140,LC007,355000,completed\nTX000141,LC008,82000,completed\nTX000142,LC008,219000,completed\nTX000143,LC008,356000,cancelled\nTX000144,LC008,83000,completed\nTX000145,LC008,220000,completed\nTX000146,LC008,357000,completed\nTX000147,LC008,84000,completed\nTX000148,LC008,221000,completed\nTX000149,LC008,358000,completed\nTX000150,LC008,85000,completed\nTX000151,LC008,222000,completed\nTX000152,LC008,359000,completed\nTX000153,LC008,86000,completed\nTX000154,LC008,223000,completed\nTX000155,LC008,360000,completed\nTX000156,LC008,87000,cancelled\nTX000157,LC008,224000,completed\nTX000158,LC008,361000,completed\nTX000159,LC008,88000,completed\nTX000160,LC008,225000,completed\nV32-south-1-160,LC001,172000,completed\nV32-south-1-161,LC001,309000,completed\nV32-south-1-162,LC001,36000,completed\nV32-south-1-163,LC001,173000,completed\nV32-south-1-164,LC001,310000,completed\nV32-south-1-165,LC001,37000,completed\nV32-south-1-166,LC001,174000,completed\nV32-south-1-167,LC001,311000,completed\nV32-south-1-168,LC001,38000,completed\nV32-south-1-169,LC001,175000,completed\nV32-south-1-170,LC001,312000,completed\nV32-south-1-171,LC001,39000,completed\nV32-south-1-172,LC001,176000,cancelled\nV32-south-1-173,LC001,313000,completed\nV32-south-1-174,LC001,40000,completed\nV32-south-1-175,LC001,177000,completed\nV32-south-1-176,LC001,314000,completed\nV32-south-1-177,LC001,41000,completed\nV32-south-1-178,LC001,178000,completed\nV32-south-1-179,LC001,315000,completed\nV32-south-1-180,LC002,42000,completed\nV32-south-1-181,LC002,179000,completed\nV32-south-1-182,LC002,316000,completed\nV32-south-1-183,LC002,43000,completed\nV32-south-1-184,LC002,180000,completed\nV32-south-1-185,LC002,317000,cancelled\nV32-south-1-186,LC002,44000,completed\nV32-south-1-187,LC002,181000,completed\nV32-south-1-188,LC002,318000,completed\nV32-south-1-189,LC002,45000,completed\nV32-south-1-190,LC002,182000,completed\nV32-south-1-191,LC002,319000,completed\nV32-south-1-192,LC002,46000,completed\nV32-south-1-193,LC002,183000,completed\nV32-south-1-194,LC002,320000,completed\nV32-south-1-195,LC002,47000,completed\nV32-south-1-196,LC002,184000,completed\nV32-south-1-197,LC002,321000,completed\nV32-south-1-198,LC002,48000,cancelled\nV32-south-1-199,LC002,185000,completed\nV32-south-1-200,LC003,322000,completed\nV32-south-1-201,LC003,49000,completed\nV32-south-1-202,LC003,186000,completed\nV32-south-1-203,LC003,323000,completed\nV32-south-1-204,LC003,50000,completed\nV32-south-1-205,LC003,187000,completed\nV32-south-1-206,LC003,324000,completed\nV32-south-1-207,LC003,51000,completed\nV32-south-1-208,LC003,188000,completed\nV32-south-1-209,LC003,325000,completed\nV32-south-1-210,LC003,52000,completed\nV32-south-1-211,LC003,189000,cancelled\nV32-south-1-212,LC003,326000,completed\nV32-south-1-213,LC003,53000,completed\nV32-south-1-214,LC003,190000,completed\nV32-south-1-215,LC003,327000,completed\nV32-south-1-216,LC003,54000,completed\nV32-south-1-217,LC003,191000,completed\nV32-south-1-218,LC003,328000,completed\nV32-south-1-219,LC003,55000,completed\nV32-south-1-220,LC004,192000,completed\nV32-south-1-221,LC004,329000,completed\nV32-south-1-222,LC004,56000,completed\nV32-south-1-223,LC004,193000,completed\nV32-south-1-224,LC004,330000,cancelled\nV32-south-1-225,LC004,57000,completed\nV32-south-1-226,LC004,194000,completed\nV32-south-1-227,LC004,331000,completed\nV32-south-1-228,LC004,58000,completed\nV32-south-1-229,LC004,195000,completed\nV32-south-1-230,LC004,332000,completed\nV32-south-1-231,LC004,59000,completed\nV32-south-1-232,LC004,196000,completed\nV32-south-1-233,LC004,333000,completed\nV32-south-1-234,LC004,60000,completed\nV32-south-1-235,LC004,197000,completed\nV32-south-1-236,LC004,334000,completed\nV32-south-1-237,LC004,61000,cancelled\nV32-south-1-238,LC004,198000,completed\nV32-south-1-239,LC004,335000,completed\n", "pos_south_pm.csv": "order_id,branch_id,amount_vnd,status\nV32-south-2-0,LC001,172000,completed\nV32-south-2-1,LC001,309000,completed\nV32-south-2-2,LC001,36000,completed\nV32-south-2-3,LC001,173000,completed\nV32-south-2-4,LC001,310000,completed\nV32-south-2-5,LC001,37000,completed\nV32-south-2-6,LC001,174000,completed\nV32-south-2-7,LC001,311000,completed\nV32-south-2-8,LC001,38000,completed\nV32-south-2-9,LC001,175000,completed\nV32-south-2-10,LC001,312000,completed\nV32-south-2-11,LC001,39000,completed\nV32-south-2-12,LC001,176000,cancelled\nV32-south-2-13,LC001,313000,completed\nV32-south-2-14,LC001,40000,completed\nV32-south-2-15,LC001,177000,completed\nV32-south-2-16,LC001,314000,completed\nV32-south-2-17,LC001,41000,completed\nV32-south-2-18,LC001,178000,completed\nV32-south-2-19,LC001,315000,completed\nV32-south-2-20,LC002,42000,completed\nV32-south-2-21,LC002,179000,completed\nV32-south-2-22,LC002,316000,completed\nV32-south-2-23,LC002,43000,completed\nV32-south-2-24,LC002,180000,completed\nV32-south-2-25,LC002,317000,cancelled\nV32-south-2-26,LC002,44000,completed\nV32-south-2-27,LC002,181000,completed\nV32-south-2-28,LC002,318000,completed\nV32-south-2-29,LC002,45000,completed\nV32-south-2-30,LC002,182000,completed\nV32-south-2-31,LC002,319000,completed\nV32-south-2-32,LC002,46000,completed\nV32-south-2-33,LC002,183000,completed\nV32-south-2-34,LC002,320000,completed\nV32-south-2-35,LC002,47000,completed\nV32-south-2-36,LC002,184000,completed\nV32-south-2-37,LC002,321000,completed\nV32-south-2-38,LC002,48000,cancelled\nV32-south-2-39,LC002,185000,completed\nV32-south-2-40,LC003,322000,completed\nV32-south-2-41,LC003,49000,completed\nV32-south-2-42,LC003,186000,completed\nV32-south-2-43,LC003,323000,completed\nV32-south-2-44,LC003,50000,completed\nV32-south-2-45,LC003,187000,completed\nV32-south-2-46,LC003,324000,completed\nV32-south-2-47,LC003,51000,completed\nV32-south-2-48,LC003,188000,completed\nV32-south-2-49,LC003,325000,completed\nV32-south-2-50,LC003,52000,completed\nV32-south-2-51,LC003,189000,cancelled\nV32-south-2-52,LC003,326000,completed\nV32-south-2-53,LC003,53000,completed\nV32-south-2-54,LC003,190000,completed\nV32-south-2-55,LC003,327000,completed\nV32-south-2-56,LC003,54000,completed\nV32-south-2-57,LC003,191000,completed\nV32-south-2-58,LC003,328000,completed\nV32-south-2-59,LC003,55000,completed\nV32-south-2-60,LC004,192000,completed\nV32-south-2-61,LC004,329000,completed\nV32-south-2-62,LC004,56000,completed\nV32-south-2-63,LC004,193000,completed\nV32-south-2-64,LC004,330000,cancelled\nV32-south-2-65,LC004,57000,completed\nV32-south-2-66,LC004,194000,completed\nV32-south-2-67,LC004,331000,completed\nV32-south-2-68,LC004,58000,completed\nV32-south-2-69,LC004,195000,completed\nV32-south-2-70,LC004,332000,completed\nV32-south-2-71,LC004,59000,completed\nV32-south-2-72,LC004,196000,completed\nV32-south-2-73,LC004,333000,completed\nV32-south-2-74,LC004,60000,completed\nV32-south-2-75,LC004,197000,completed\nV32-south-2-76,LC004,334000,completed\nV32-south-2-77,LC004,61000,cancelled\nV32-south-2-78,LC004,198000,completed\nV32-south-2-79,LC004,335000,completed\nV32-south-2-80,LC005,62000,completed\nV32-south-2-81,LC005,199000,completed\nV32-south-2-82,LC005,336000,completed\nV32-south-2-83,LC005,63000,completed\nV32-south-2-84,LC005,200000,completed\nV32-south-2-85,LC005,337000,completed\nV32-south-2-86,LC005,64000,completed\nV32-south-2-87,LC005,201000,completed\nV32-south-2-88,LC005,338000,completed\nV32-south-2-89,LC005,65000,completed\nV32-south-2-90,LC005,202000,cancelled\nV32-south-2-91,LC005,339000,completed\nV32-south-2-92,LC005,66000,completed\nV32-south-2-93,LC005,203000,completed\nV32-south-2-94,LC005,340000,completed\nV32-south-2-95,LC005,67000,completed\nV32-south-2-96,LC005,204000,completed\nV32-south-2-97,LC005,341000,completed\nV32-south-2-98,LC005,68000,completed\nV32-south-2-99,LC005,205000,completed\nV32-south-2-100,LC006,342000,completed\nV32-south-2-101,LC006,69000,completed\nV32-south-2-102,LC006,206000,completed\nV32-south-2-103,LC006,343000,cancelled\nV32-south-2-104,LC006,70000,completed\nV32-south-2-105,LC006,207000,completed\nV32-south-2-106,LC006,344000,completed\nV32-south-2-107,LC006,71000,completed\nV32-south-2-108,LC006,208000,completed\nV32-south-2-109,LC006,345000,completed\nV32-south-2-110,LC006,72000,completed\nV32-south-2-111,LC006,209000,completed\nV32-south-2-112,LC006,346000,completed\nV32-south-2-113,LC006,73000,completed\nV32-south-2-114,LC006,210000,completed\nV32-south-2-115,LC006,347000,completed\nV32-south-2-116,LC006,74000,cancelled\nV32-south-2-117,LC006,211000,completed\nV32-south-2-118,LC006,348000,completed\nV32-south-2-119,LC006,75000,completed\nV32-south-2-120,LC007,212000,completed\nV32-south-2-121,LC007,349000,completed\nV32-south-2-122,LC007,76000,completed\nV32-south-2-123,LC007,213000,completed\nV32-south-2-124,LC007,350000,completed\nV32-south-2-125,LC007,77000,completed\nV32-south-2-126,LC007,214000,completed\nV32-south-2-127,LC007,351000,completed\nV32-south-2-128,LC007,78000,completed\nV32-south-2-129,LC007,215000,cancelled\nV32-south-2-130,LC007,352000,completed\nV32-south-2-131,LC007,79000,completed\nV32-south-2-132,LC007,216000,completed\nV32-south-2-133,LC007,353000,completed\nV32-south-2-134,LC007,80000,completed\nV32-south-2-135,LC007,217000,completed\nV32-south-2-136,LC007,354000,completed\nV32-south-2-137,LC007,81000,completed\nV32-south-2-138,LC007,218000,completed\nV32-south-2-139,LC007,355000,completed\nV32-south-2-140,LC008,82000,completed\nV32-south-2-141,LC008,219000,completed\nV32-south-2-142,LC008,356000,cancelled\nV32-south-2-143,LC008,83000,completed\nV32-south-2-144,LC008,220000,completed\nV32-south-2-145,LC008,357000,completed\nV32-south-2-146,LC008,84000,completed\nV32-south-2-147,LC008,221000,completed\nV32-south-2-148,LC008,358000,completed\nV32-south-2-149,LC008,85000,completed\nV32-south-2-150,LC008,222000,completed\nV32-south-2-151,LC008,359000,completed\nV32-south-2-152,LC008,86000,completed\nV32-south-2-153,LC008,223000,completed\nV32-south-2-154,LC008,360000,completed\nV32-south-2-155,LC008,87000,cancelled\nV32-south-2-156,LC008,224000,completed\nV32-south-2-157,LC008,361000,completed\nV32-south-2-158,LC008,88000,completed\nV32-south-2-159,LC008,225000,completed\nV32-south-2-160,LC001,172000,completed\nV32-south-2-161,LC001,309000,completed\nV32-south-2-162,LC001,36000,completed\nV32-south-2-163,LC001,173000,completed\nV32-south-2-164,LC001,310000,completed\nV32-south-2-165,LC001,37000,completed\nV32-south-2-166,LC001,174000,completed\nV32-south-2-167,LC001,311000,completed\nV32-south-2-168,LC001,38000,completed\nV32-south-2-169,LC001,175000,completed\nV32-south-2-170,LC001,312000,completed\nV32-south-2-171,LC001,39000,completed\nV32-south-2-172,LC001,176000,cancelled\nV32-south-2-173,LC001,313000,completed\nV32-south-2-174,LC001,40000,completed\nV32-south-2-175,LC001,177000,completed\nV32-south-2-176,LC001,314000,completed\nV32-south-2-177,LC001,41000,completed\nV32-south-2-178,LC001,178000,completed\nV32-south-2-179,LC001,315000,completed\nV32-south-2-180,LC002,42000,completed\nV32-south-2-181,LC002,179000,completed\nV32-south-2-182,LC002,316000,completed\nV32-south-2-183,LC002,43000,completed\nV32-south-2-184,LC002,180000,completed\nV32-south-2-185,LC002,317000,cancelled\nV32-south-2-186,LC002,44000,completed\nV32-south-2-187,LC002,181000,completed\nV32-south-2-188,LC002,318000,completed\nV32-south-2-189,LC002,45000,completed\nV32-south-2-190,LC002,182000,completed\nV32-south-2-191,LC002,319000,completed\nV32-south-2-192,LC002,46000,completed\nV32-south-2-193,LC002,183000,completed\nV32-south-2-194,LC002,320000,completed\nV32-south-2-195,LC002,47000,completed\nV32-south-2-196,LC002,184000,completed\nV32-south-2-197,LC002,321000,completed\nV32-south-2-198,LC002,48000,cancelled\nV32-south-2-199,LC002,185000,completed\nV32-south-2-200,LC003,322000,completed\nV32-south-2-201,LC003,49000,completed\nV32-south-2-202,LC003,186000,completed\nV32-south-2-203,LC003,323000,completed\nV32-south-2-204,LC003,50000,completed\nV32-south-2-205,LC003,187000,completed\nV32-south-2-206,LC003,324000,completed\nV32-south-2-207,LC003,51000,completed\nV32-south-2-208,LC003,188000,completed\nV32-south-2-209,LC003,325000,completed\nV32-south-2-210,LC003,52000,completed\nV32-south-2-211,LC003,189000,cancelled\nV32-south-2-212,LC003,326000,completed\nV32-south-2-213,LC003,53000,completed\nV32-south-2-214,LC003,190000,completed\nV32-south-2-215,LC003,327000,completed\nV32-south-2-216,LC003,54000,completed\nV32-south-2-217,LC003,191000,completed\nV32-south-2-218,LC003,328000,completed\nV32-south-2-219,LC003,55000,completed\nV32-south-2-220,LC004,192000,completed\nV32-south-2-221,LC004,329000,completed\nV32-south-2-222,LC004,56000,completed\nV32-south-2-223,LC004,193000,completed\nV32-south-2-224,LC004,330000,cancelled\nV32-south-2-225,LC004,57000,completed\nV32-south-2-226,LC004,194000,completed\nV32-south-2-227,LC004,331000,completed\nV32-south-2-228,LC004,58000,completed\nV32-south-2-229,LC004,195000,completed\nV32-south-2-230,LC004,332000,completed\nV32-south-2-231,LC004,59000,completed\nV32-south-2-232,LC004,196000,completed\nV32-south-2-233,LC004,333000,completed\nV32-south-2-234,LC004,60000,completed\nV32-south-2-235,LC004,197000,completed\nV32-south-2-236,LC004,334000,completed\nV32-south-2-237,LC004,61000,cancelled\nV32-south-2-238,LC004,198000,completed\nV32-south-2-239,LC004,335000,completed\n", "pos_central_pm.csv": "order_id,branch_id,amount_vnd,status\nV32-central-2-0,LC009,362000,completed\nV32-central-2-1,LC009,89000,completed\nV32-central-2-2,LC009,226000,completed\nV32-central-2-3,LC009,363000,completed\nV32-central-2-4,LC009,90000,completed\nV32-central-2-5,LC009,227000,completed\nV32-central-2-6,LC009,364000,completed\nV32-central-2-7,LC009,91000,completed\nV32-central-2-8,LC009,228000,cancelled\nV32-central-2-9,LC009,365000,completed\nV32-central-2-10,LC009,92000,completed\nV32-central-2-11,LC009,229000,completed\nV32-central-2-12,LC009,366000,completed\nV32-central-2-13,LC009,93000,completed\nV32-central-2-14,LC009,230000,completed\nV32-central-2-15,LC009,367000,completed\nV32-central-2-16,LC009,94000,completed\nV32-central-2-17,LC009,231000,completed\nV32-central-2-18,LC009,368000,completed\nV32-central-2-19,LC009,95000,completed\nV32-central-2-20,LC010,232000,completed\nV32-central-2-21,LC010,369000,cancelled\nV32-central-2-22,LC010,96000,completed\nV32-central-2-23,LC010,233000,completed\nV32-central-2-24,LC010,370000,completed\nV32-central-2-25,LC010,97000,completed\nV32-central-2-26,LC010,234000,completed\nV32-central-2-27,LC010,371000,completed\nV32-central-2-28,LC010,98000,completed\nV32-central-2-29,LC010,235000,completed\nV32-central-2-30,LC010,372000,completed\nV32-central-2-31,LC010,99000,completed\nV32-central-2-32,LC010,236000,completed\nV32-central-2-33,LC010,373000,completed\nV32-central-2-34,LC010,100000,cancelled\nV32-central-2-35,LC010,237000,completed\nV32-central-2-36,LC010,374000,completed\nV32-central-2-37,LC010,101000,completed\nV32-central-2-38,LC010,238000,completed\nV32-central-2-39,LC010,375000,completed\nV32-central-2-40,LC011,102000,completed\nV32-central-2-41,LC011,239000,completed\nV32-central-2-42,LC011,376000,completed\nV32-central-2-43,LC011,103000,completed\nV32-central-2-44,LC011,240000,completed\nV32-central-2-45,LC011,377000,completed\nV32-central-2-46,LC011,104000,completed\nV32-central-2-47,LC011,241000,cancelled\nV32-central-2-48,LC011,378000,completed\nV32-central-2-49,LC011,105000,completed\nV32-central-2-50,LC011,242000,completed\nV32-central-2-51,LC011,379000,completed\nV32-central-2-52,LC011,106000,completed\nV32-central-2-53,LC011,243000,completed\nV32-central-2-54,LC011,380000,completed\nV32-central-2-55,LC011,107000,completed\nV32-central-2-56,LC011,244000,completed\nV32-central-2-57,LC011,381000,completed\nV32-central-2-58,LC011,108000,completed\nV32-central-2-59,LC011,245000,completed\nV32-central-2-60,LC012,382000,cancelled\nV32-central-2-61,LC012,109000,completed\nV32-central-2-62,LC012,246000,completed\nV32-central-2-63,LC012,383000,completed\nV32-central-2-64,LC012,110000,completed\nV32-central-2-65,LC012,247000,completed\nV32-central-2-66,LC012,384000,completed\nV32-central-2-67,LC012,111000,completed\nV32-central-2-68,LC012,248000,completed\nV32-central-2-69,LC012,385000,completed\nV32-central-2-70,LC012,112000,completed\nV32-central-2-71,LC012,249000,completed\nV32-central-2-72,LC012,386000,completed\nV32-central-2-73,LC012,113000,cancelled\nV32-central-2-74,LC012,250000,completed\nV32-central-2-75,LC012,387000,completed\nV32-central-2-76,LC012,114000,completed\nV32-central-2-77,LC012,251000,completed\nV32-central-2-78,LC012,388000,completed\nV32-central-2-79,LC012,115000,completed\nV32-central-2-80,LC013,252000,completed\nV32-central-2-81,LC013,389000,completed\nV32-central-2-82,LC013,116000,completed\nV32-central-2-83,LC013,253000,completed\nV32-central-2-84,LC013,390000,completed\nV32-central-2-85,LC013,117000,completed\nV32-central-2-86,LC013,254000,cancelled\nV32-central-2-87,LC013,391000,completed\nV32-central-2-88,LC013,118000,completed\nV32-central-2-89,LC013,255000,completed\nV32-central-2-90,LC013,392000,completed\nV32-central-2-91,LC013,119000,completed\nV32-central-2-92,LC013,256000,completed\nV32-central-2-93,LC013,393000,completed\nV32-central-2-94,LC013,120000,completed\nV32-central-2-95,LC013,257000,completed\nV32-central-2-96,LC013,394000,completed\nV32-central-2-97,LC013,121000,completed\nV32-central-2-98,LC013,258000,completed\nV32-central-2-99,LC013,395000,cancelled\nV32-central-2-100,LC014,122000,completed\nV32-central-2-101,LC014,259000,completed\nV32-central-2-102,LC014,396000,completed\nV32-central-2-103,LC014,123000,completed\nV32-central-2-104,LC014,260000,completed\nV32-central-2-105,LC014,397000,completed\nV32-central-2-106,LC014,124000,completed\nV32-central-2-107,LC014,261000,completed\nV32-central-2-108,LC014,398000,completed\nV32-central-2-109,LC014,125000,completed\nV32-central-2-110,LC014,262000,completed\nV32-central-2-111,LC014,399000,completed\nV32-central-2-112,LC014,126000,cancelled\nV32-central-2-113,LC014,263000,completed\nV32-central-2-114,LC014,400000,completed\nV32-central-2-115,LC014,127000,completed\nV32-central-2-116,LC014,264000,completed\nV32-central-2-117,LC014,401000,completed\nV32-central-2-118,LC014,128000,completed\nV32-central-2-119,LC014,265000,completed\nV32-central-2-120,LC015,402000,completed\nV32-central-2-121,LC015,129000,completed\nV32-central-2-122,LC015,266000,completed\nV32-central-2-123,LC015,403000,completed\nV32-central-2-124,LC015,130000,completed\nV32-central-2-125,LC015,267000,cancelled\nV32-central-2-126,LC015,404000,completed\nV32-central-2-127,LC015,131000,completed\nV32-central-2-128,LC015,268000,completed\nV32-central-2-129,LC015,405000,completed\nV32-central-2-130,LC015,132000,completed\nV32-central-2-131,LC015,269000,completed\nV32-central-2-132,LC015,406000,completed\nV32-central-2-133,LC015,133000,completed\nV32-central-2-134,LC015,270000,completed\nV32-central-2-135,LC015,407000,completed\nV32-central-2-136,LC015,134000,completed\nV32-central-2-137,LC015,271000,completed\nV32-central-2-138,LC015,408000,cancelled\nV32-central-2-139,LC015,135000,completed\nV32-central-2-140,LC016,272000,completed\nV32-central-2-141,LC016,409000,completed\nV32-central-2-142,LC016,136000,completed\nV32-central-2-143,LC016,273000,completed\nV32-central-2-144,LC016,410000,completed\nV32-central-2-145,LC016,137000,completed\nV32-central-2-146,LC016,274000,completed\nV32-central-2-147,LC016,411000,completed\nV32-central-2-148,LC016,138000,completed\nV32-central-2-149,LC016,275000,completed\nV32-central-2-150,LC016,412000,completed\nV32-central-2-151,LC016,139000,cancelled\nV32-central-2-152,LC016,276000,completed\nV32-central-2-153,LC016,413000,completed\nV32-central-2-154,LC016,140000,completed\nV32-central-2-155,LC016,277000,completed\nV32-central-2-156,LC016,414000,completed\nV32-central-2-157,LC016,141000,completed\nV32-central-2-158,LC016,278000,completed\nV32-central-2-159,LC016,415000,completed\nV32-central-2-160,LC009,362000,completed\nV32-central-2-161,LC009,89000,completed\nV32-central-2-162,LC009,226000,completed\nV32-central-2-163,LC009,363000,completed\nV32-central-2-164,LC009,90000,completed\nV32-central-2-165,LC009,227000,completed\nV32-central-2-166,LC009,364000,completed\nV32-central-2-167,LC009,91000,completed\nV32-central-2-168,LC009,228000,cancelled\nV32-central-2-169,LC009,365000,completed\nV32-central-2-170,LC009,92000,completed\nV32-central-2-171,LC009,229000,completed\nV32-central-2-172,LC009,366000,completed\nV32-central-2-173,LC009,93000,completed\nV32-central-2-174,LC009,230000,completed\nV32-central-2-175,LC009,367000,completed\nV32-central-2-176,LC009,94000,completed\nV32-central-2-177,LC009,231000,completed\nV32-central-2-178,LC009,368000,completed\nV32-central-2-179,LC009,95000,completed\nV32-central-2-180,LC010,232000,completed\nV32-central-2-181,LC010,369000,cancelled\nV32-central-2-182,LC010,96000,completed\nV32-central-2-183,LC010,233000,completed\nV32-central-2-184,LC010,370000,completed\nV32-central-2-185,LC010,97000,completed\nV32-central-2-186,LC010,234000,completed\nV32-central-2-187,LC010,371000,completed\nV32-central-2-188,LC010,98000,completed\nV32-central-2-189,LC010,235000,completed\nV32-central-2-190,LC010,372000,completed\nV32-central-2-191,LC010,99000,completed\nV32-central-2-192,LC010,236000,completed\nV32-central-2-193,LC010,373000,completed\nV32-central-2-194,LC010,100000,cancelled\nV32-central-2-195,LC010,237000,completed\nV32-central-2-196,LC010,374000,completed\nV32-central-2-197,LC010,101000,completed\nV32-central-2-198,LC010,238000,completed\nV32-central-2-199,LC010,375000,completed\nV32-central-2-200,LC011,102000,completed\nV32-central-2-201,LC011,239000,completed\nV32-central-2-202,LC011,376000,completed\nV32-central-2-203,LC011,103000,completed\nV32-central-2-204,LC011,240000,completed\nV32-central-2-205,LC011,377000,completed\nV32-central-2-206,LC011,104000,completed\nV32-central-2-207,LC011,241000,cancelled\nV32-central-2-208,LC011,378000,completed\nV32-central-2-209,LC011,105000,completed\nV32-central-2-210,LC011,242000,completed\nV32-central-2-211,LC011,379000,completed\nV32-central-2-212,LC011,106000,completed\nV32-central-2-213,LC011,243000,completed\nV32-central-2-214,LC011,380000,completed\nV32-central-2-215,LC011,107000,completed\nV32-central-2-216,LC011,244000,completed\nV32-central-2-217,LC011,381000,completed\nV32-central-2-218,LC011,108000,completed\nV32-central-2-219,LC011,245000,completed\nV32-central-2-220,LC012,382000,cancelled\nV32-central-2-221,LC012,109000,completed\nV32-central-2-222,LC012,246000,completed\nV32-central-2-223,LC012,383000,completed\nV32-central-2-224,LC012,110000,completed\nV32-central-2-225,LC012,247000,completed\nV32-central-2-226,LC012,384000,completed\nV32-central-2-227,LC012,111000,completed\nV32-central-2-228,LC012,248000,completed\nV32-central-2-229,LC012,385000,completed\nV32-central-2-230,LC012,112000,completed\nV32-central-2-231,LC012,249000,completed\nV32-central-2-232,LC012,386000,completed\nV32-central-2-233,LC012,113000,cancelled\nV32-central-2-234,LC012,250000,completed\nV32-central-2-235,LC012,387000,completed\nV32-central-2-236,LC012,114000,completed\nV32-central-2-237,LC012,251000,completed\nV32-central-2-238,LC012,388000,completed\nV32-central-2-239,LC012,115000,completed\n", "pos_north_pm.csv": "order_id,branch_id,amount_vnd,status\nV32-north-2-0,LC017,142000,completed\nV32-north-2-1,LC017,279000,completed\nV32-north-2-2,LC017,416000,completed\nV32-north-2-3,LC017,143000,completed\nV32-north-2-4,LC017,280000,cancelled\nV32-north-2-5,LC017,417000,completed\nV32-north-2-6,LC017,144000,completed\nV32-north-2-7,LC017,281000,completed\nV32-north-2-8,LC017,418000,completed\nV32-north-2-9,LC017,145000,completed\nV32-north-2-10,LC017,282000,completed\nV32-north-2-11,LC017,419000,completed\nV32-north-2-12,LC017,146000,completed\nV32-north-2-13,LC017,283000,completed\nV32-north-2-14,LC017,420000,completed\nV32-north-2-15,LC017,147000,completed\nV32-north-2-16,LC017,284000,completed\nV32-north-2-17,LC017,421000,cancelled\nV32-north-2-18,LC017,148000,completed\nV32-north-2-19,LC017,285000,completed\nV32-north-2-20,LC018,422000,completed\nV32-north-2-21,LC018,149000,completed\nV32-north-2-22,LC018,286000,completed\nV32-north-2-23,LC018,423000,completed\nV32-north-2-24,LC018,150000,completed\nV32-north-2-25,LC018,287000,completed\nV32-north-2-26,LC018,424000,completed\nV32-north-2-27,LC018,151000,completed\nV32-north-2-28,LC018,288000,completed\nV32-north-2-29,LC018,425000,completed\nV32-north-2-30,LC018,152000,cancelled\nV32-north-2-31,LC018,289000,completed\nV32-north-2-32,LC018,426000,completed\nV32-north-2-33,LC018,153000,completed\nV32-north-2-34,LC018,290000,completed\nV32-north-2-35,LC018,427000,completed\nV32-north-2-36,LC018,154000,completed\nV32-north-2-37,LC018,291000,completed\nV32-north-2-38,LC018,428000,completed\nV32-north-2-39,LC018,155000,completed\nV32-north-2-40,LC019,292000,completed\nV32-north-2-41,LC019,429000,completed\nV32-north-2-42,LC019,156000,completed\nV32-north-2-43,LC019,293000,cancelled\nV32-north-2-44,LC019,430000,completed\nV32-north-2-45,LC019,157000,completed\nV32-north-2-46,LC019,294000,completed\nV32-north-2-47,LC019,431000,completed\nV32-north-2-48,LC019,158000,completed\nV32-north-2-49,LC019,295000,completed\nV32-north-2-50,LC019,432000,completed\nV32-north-2-51,LC019,159000,completed\nV32-north-2-52,LC019,296000,completed\nV32-north-2-53,LC019,433000,completed\nV32-north-2-54,LC019,160000,completed\nV32-north-2-55,LC019,297000,completed\nV32-north-2-56,LC019,434000,cancelled\nV32-north-2-57,LC019,161000,completed\nV32-north-2-58,LC019,298000,completed\nV32-north-2-59,LC019,435000,completed\nV32-north-2-60,LC020,162000,completed\nV32-north-2-61,LC020,299000,completed\nV32-north-2-62,LC020,436000,completed\nV32-north-2-63,LC020,163000,completed\nV32-north-2-64,LC020,300000,completed\nV32-north-2-65,LC020,437000,completed\nV32-north-2-66,LC020,164000,completed\nV32-north-2-67,LC020,301000,completed\nV32-north-2-68,LC020,438000,completed\nV32-north-2-69,LC020,165000,cancelled\nV32-north-2-70,LC020,302000,completed\nV32-north-2-71,LC020,439000,completed\nV32-north-2-72,LC020,166000,completed\nV32-north-2-73,LC020,303000,completed\nV32-north-2-74,LC020,440000,completed\nV32-north-2-75,LC020,167000,completed\nV32-north-2-76,LC020,304000,completed\nV32-north-2-77,LC020,441000,completed\nV32-north-2-78,LC020,168000,completed\nV32-north-2-79,LC020,305000,completed\nV32-north-2-80,LC021,442000,completed\nV32-north-2-81,LC021,169000,completed\nV32-north-2-82,LC021,306000,cancelled\nV32-north-2-83,LC021,443000,completed\nV32-north-2-84,LC021,170000,completed\nV32-north-2-85,LC021,307000,completed\nV32-north-2-86,LC021,444000,completed\nV32-north-2-87,LC021,171000,completed\nV32-north-2-88,LC021,308000,completed\nV32-north-2-89,LC021,35000,completed\nV32-north-2-90,LC021,172000,completed\nV32-north-2-91,LC021,309000,completed\nV32-north-2-92,LC021,36000,completed\nV32-north-2-93,LC021,173000,completed\nV32-north-2-94,LC021,310000,completed\nV32-north-2-95,LC021,37000,cancelled\nV32-north-2-96,LC021,174000,completed\nV32-north-2-97,LC021,311000,completed\nV32-north-2-98,LC021,38000,completed\nV32-north-2-99,LC021,175000,completed\nV32-north-2-100,LC022,312000,completed\nV32-north-2-101,LC022,39000,completed\nV32-north-2-102,LC022,176000,completed\nV32-north-2-103,LC022,313000,completed\nV32-north-2-104,LC022,40000,completed\nV32-north-2-105,LC022,177000,completed\nV32-north-2-106,LC022,314000,completed\nV32-north-2-107,LC022,41000,completed\nV32-north-2-108,LC022,178000,cancelled\nV32-north-2-109,LC022,315000,completed\nV32-north-2-110,LC022,42000,completed\nV32-north-2-111,LC022,179000,completed\nV32-north-2-112,LC022,316000,completed\nV32-north-2-113,LC022,43000,completed\nV32-north-2-114,LC022,180000,completed\nV32-north-2-115,LC022,317000,completed\nV32-north-2-116,LC022,44000,completed\nV32-north-2-117,LC022,181000,completed\nV32-north-2-118,LC022,318000,completed\nV32-north-2-119,LC022,45000,completed\nV32-north-2-120,LC023,182000,completed\nV32-north-2-121,LC023,319000,cancelled\nV32-north-2-122,LC023,46000,completed\nV32-north-2-123,LC023,183000,completed\nV32-north-2-124,LC023,320000,completed\nV32-north-2-125,LC023,47000,completed\nV32-north-2-126,LC023,184000,completed\nV32-north-2-127,LC023,321000,completed\nV32-north-2-128,LC023,48000,completed\nV32-north-2-129,LC023,185000,completed\nV32-north-2-130,LC023,322000,completed\nV32-north-2-131,LC023,49000,completed\nV32-north-2-132,LC023,186000,completed\nV32-north-2-133,LC023,323000,completed\nV32-north-2-134,LC023,50000,cancelled\nV32-north-2-135,LC023,187000,completed\nV32-north-2-136,LC023,324000,completed\nV32-north-2-137,LC023,51000,completed\nV32-north-2-138,LC023,188000,completed\nV32-north-2-139,LC023,325000,completed\nV32-north-2-140,LC024,52000,completed\nV32-north-2-141,LC024,189000,completed\nV32-north-2-142,LC024,326000,completed\nV32-north-2-143,LC024,53000,completed\nV32-north-2-144,LC024,190000,completed\nV32-north-2-145,LC024,327000,completed\nV32-north-2-146,LC024,54000,completed\nV32-north-2-147,LC024,191000,cancelled\nV32-north-2-148,LC024,328000,completed\nV32-north-2-149,LC024,55000,completed\nV32-north-2-150,LC024,192000,completed\nV32-north-2-151,LC024,329000,completed\nV32-north-2-152,LC024,56000,completed\nV32-north-2-153,LC024,193000,completed\nV32-north-2-154,LC024,330000,completed\nV32-north-2-155,LC024,57000,completed\nV32-north-2-156,LC024,194000,completed\nV32-north-2-157,LC024,331000,completed\nV32-north-2-158,LC024,58000,completed\nV32-north-2-159,LC024,195000,completed\nV32-north-2-160,LC017,142000,completed\nV32-north-2-161,LC017,279000,completed\nV32-north-2-162,LC017,416000,completed\nV32-north-2-163,LC017,143000,completed\nV32-north-2-164,LC017,280000,cancelled\nV32-north-2-165,LC017,417000,completed\nV32-north-2-166,LC017,144000,completed\nV32-north-2-167,LC017,281000,completed\nV32-north-2-168,LC017,418000,completed\nV32-north-2-169,LC017,145000,completed\nV32-north-2-170,LC017,282000,completed\nV32-north-2-171,LC017,419000,completed\nV32-north-2-172,LC017,146000,completed\nV32-north-2-173,LC017,283000,completed\nV32-north-2-174,LC017,420000,completed\nV32-north-2-175,LC017,147000,completed\nV32-north-2-176,LC017,284000,completed\nV32-north-2-177,LC017,421000,cancelled\nV32-north-2-178,LC017,148000,completed\nV32-north-2-179,LC017,285000,completed\nV32-north-2-180,LC018,422000,completed\nV32-north-2-181,LC018,149000,completed\nV32-north-2-182,LC018,286000,completed\nV32-north-2-183,LC018,423000,completed\nV32-north-2-184,LC018,150000,completed\nV32-north-2-185,LC018,287000,completed\nV32-north-2-186,LC018,424000,completed\nV32-north-2-187,LC018,151000,completed\nV32-north-2-188,LC018,288000,completed\nV32-north-2-189,LC018,425000,completed\nV32-north-2-190,LC018,152000,cancelled\nV32-north-2-191,LC018,289000,completed\nV32-north-2-192,LC018,426000,completed\nV32-north-2-193,LC018,153000,completed\nV32-north-2-194,LC018,290000,completed\nV32-north-2-195,LC018,427000,completed\nV32-north-2-196,LC018,154000,completed\nV32-north-2-197,LC018,291000,completed\nV32-north-2-198,LC018,428000,completed\nV32-north-2-199,LC018,155000,completed\nV32-north-2-200,LC019,292000,completed\nV32-north-2-201,LC019,429000,completed\nV32-north-2-202,LC019,156000,completed\nV32-north-2-203,LC019,293000,cancelled\nV32-north-2-204,LC019,430000,completed\nV32-north-2-205,LC019,157000,completed\nV32-north-2-206,LC019,294000,completed\nV32-north-2-207,LC019,431000,completed\nV32-north-2-208,LC019,158000,completed\nV32-north-2-209,LC019,295000,completed\nV32-north-2-210,LC019,432000,completed\nV32-north-2-211,LC019,159000,completed\nV32-north-2-212,LC019,296000,completed\nV32-north-2-213,LC019,433000,completed\nV32-north-2-214,LC019,160000,completed\nV32-north-2-215,LC019,297000,completed\nV32-north-2-216,LC019,434000,cancelled\nV32-north-2-217,LC019,161000,completed\nV32-north-2-218,LC019,298000,completed\nV32-north-2-219,LC019,435000,completed\nV32-north-2-220,LC020,162000,completed\nV32-north-2-221,LC020,299000,completed\nV32-north-2-222,LC020,436000,completed\nV32-north-2-223,LC020,163000,completed\nV32-north-2-224,LC020,300000,completed\nV32-north-2-225,LC020,437000,completed\nV32-north-2-226,LC020,164000,completed\nV32-north-2-227,LC020,301000,completed\nV32-north-2-228,LC020,438000,completed\nV32-north-2-229,LC020,165000,cancelled\nV32-north-2-230,LC020,302000,completed\nV32-north-2-231,LC020,439000,completed\nV32-north-2-232,LC020,166000,completed\nV32-north-2-233,LC020,303000,completed\nV32-north-2-234,LC020,440000,completed\nV32-north-2-235,LC020,167000,completed\nV32-north-2-236,LC020,304000,completed\nV32-north-2-237,LC020,441000,completed\nV32-north-2-238,LC020,168000,completed\nV32-north-2-239,LC020,305000,completed\n"}</script>
+<script>"use strict";
+
+const files = [
+  {name: "batch_control.csv", label: "Batch Control", key: "CTRL", rows: 8, fields: ["file", "expected_count", "business_date", "received_ict"]},
+  {name: "branch_master.csv", label: "Branch Master", key: "MASTER", rows: 24, fields: ["branch_id", "region"]},
+  {name: "pos_south.csv", label: "POS South", key: "POS-S", rows: 240, fields: ["order_id", "branch_id", "amount_vnd", "status"]},
+  {name: "pos_central.csv", label: "POS Central", key: "POS-C", rows: 240, fields: ["order_id", "branch_id", "amount_vnd", "status"]},
+  {name: "pos_north.csv", label: "POS North", key: "POS-N", rows: 240, fields: ["order_id", "branch_id", "amount_vnd", "status"]},
+  {name: "pos_south_pm.csv", label: "POS South PM", key: "POS-S2", rows: 240, fields: ["order_id", "branch_id", "amount_vnd", "status"]},
+  {name: "pos_central_pm.csv", label: "POS Central PM", key: "POS-C2", rows: 240, fields: ["order_id", "branch_id", "amount_vnd", "status"]},
+  {name: "pos_north_pm.csv", label: "POS North PM", key: "POS-N2", rows: 240, fields: ["order_id", "branch_id", "amount_vnd", "status"]},
+  {name: "erp_daily_totals.csv", label: "Finance ERP", key: "ERP", rows: 24, fields: ["branch_id", "total_vnd"]},
+];
+const ruleNames = [
+  "Schema / cột bắt buộc", "Order ID duy nhất", "Trạng thái giao dịch", "Số tiền hợp lệ",
+  "Mã thuộc Branch Master", "Đối soát POS ↔ ERP", "Đủ dòng theo Batch Control", "Đúng giờ nhận nguồn",
+];
+const steps = ["intake", "scan", "gate", "triage", "publish"];
+const total = files.reduce((sum, file) => sum + file.rows, 0);
+const fixtures = JSON.parse(document.getElementById("fixtures").textContent);
+const cutoff = "06:00";
+const businessDate = "2026-11-22";
+const delta = 25000;
+const byId = id => document.getElementById(id);
+const money = new Intl.NumberFormat("vi-VN");
+const format = n => money.format(n);
+const vnd = n => `${format(n)} ₫`;
+const escape = value => String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+const events = [];
+const history = [];
+let follow = true;
+let running = false;
+let scanned = 0;
+let read = 0;
+let latest = null;
+let approved = false;
+let attemptedScenario = "";
+let activeRun = "";
+const firstSeen = new Set();
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function choosePage(id) {
+  document.querySelectorAll(".page").forEach(page => { page.hidden = page.id !== id; });
+  document.querySelectorAll(".tab").forEach(tab => {
+    const active = tab.dataset.page === id;
+    tab.classList.toggle("selected", active);
+    if (active) tab.setAttribute("aria-current", "page");
+    else tab.removeAttribute("aria-current");
+  });
+  if (id === "evidence") renderEvidence();
+}
+
+function renderFiles() {
+  const list = byId("file-list");
+  list.replaceChildren();
+  for (const file of files) {
+    const row = element("div", "file");
+    row.id = `file-${file.key}`;
+    const title = element("div");
+    title.append(element("b", "", file.label), element("small", "", file.name));
+    row.append(element("div", "glyph", "CSV"), title, element("span", "state", `0/${file.rows}`));
+    list.append(row);
+  }
+}
+
+function fileState(file, caption, state) {
+  nodeState(file.key, state, caption === "MISSING" ? "THIẾU" : "");
+  const row = byId(`file-${file.key}`);
+  row.className = `file ${state === "active" ? "active" : ""}`;
+  const marker = row.querySelector(".state");
+  marker.className = `state ${state}`;
+  marker.textContent = caption;
+}
+
+function renderRules() {
+  const list = byId("check-list");
+  list.replaceChildren(...ruleNames.map((name, index) => {
+    const row = element("li", "check");
+    row.id = `check-${index}`;
+    row.append(element("span", "", name), element("b", "", "—"));
+    return row;
+  }));
+}
+
+const graphState = new Map();
+const graphRoutes = [...document.querySelectorAll(".network .route")];
+function nodeState(step, status, label = "") {
+  graphState.set(step, status);
+  byId("net-"+step).setAttribute("class", "station "+status);
+  byId("sig-"+step).textContent = label || ({fail:"FAIL", waiting:"CHỜ QA", active:"", pass:""}[status] || "");
+  for (const edge of graphRoutes) {
+    const to = edge.getAttribute("data-to");
+    if (to === "gate") {
+      if (step === "gate") edge.classList.remove("live");
+    } else if (to === step) edge.classList.toggle("live", status === "active");
+  }
+}
+function showGateInputs(index, tables) {
+  const pos = files.filter(file => file.key.startsWith("POS")).map(file => file.key);
+  const inputs = [Object.keys(tables), pos, pos, [...pos,"ERP"], [...pos,"ERP","MASTER"], [...pos,"ERP"], Object.keys(tables), Object.keys(tables)][index];
+  graphRoutes.filter(edge => edge.getAttribute("data-to") === "gate").forEach(edge => {
+    const key = edge.getAttribute("data-from");
+    edge.classList.toggle("live", Boolean(tables[key]) && inputs.includes(key));
+  });
+}
+function pill(id, title, status = "") {
+  const item = byId(id);
+  item.textContent = title;
+  item.className = `pill ${status}`;
+}
+
+function decision(label, description, state = "") {
+  const root = byId("decision");
+  root.className = state;
+  root.replaceChildren(element("strong", "", label), element("p", "", description));
+}
+
+function updateCounts() {
+  byId("file-count").innerHTML = `${read} <small>/ ${files.length}</small>`;
+  byId("record-count").innerHTML = `${format(scanned)} <small>/ ${format(total)}</small>`;
+  const percent = Math.round(scanned / total * 100);
+  byId("progress").setAttribute("aria-valuenow", scanned);
+  byId("progress").querySelector("i").style.width = `${percent}%`;
+  byId("progress-label").textContent = `${percent}%`;
+}
+
+function appendEvents(source, messages, type = "") {
+  const stream = byId("stream");
+  stream.querySelector(".log-empty")?.remove();
+  const rows = document.createDocumentFragment();
+  for (const message of messages) {
+    const timestamp = new Date();
+    const time = timestamp.toISOString().slice(11, 23);
+    const status = typeof message === "string" ? type : message.status;
+    const details = typeof message === "string" ? message : message.details;
+    events.push({run: activeRun, at: timestamp.toISOString(), source, status, details});
+    const row = element("div", `log-row ${status} ${type === "record" ? "" : "event"}`);
+    row.append(element("time", "", time.slice(0, 8)), element("b", "", source), element("span", "", details));
+    rows.append(row);
+  }
+  stream.append(rows);
+  if (follow) stream.scrollTop = stream.scrollHeight;
+  byId("stream-info").textContent = `${format(stream.childElementCount)} sự kiện trong lần chạy · UTC`;
+  byId("export").disabled = false;
+}
+
+function recordEvent(file, row) {
+  if (row.order_id) {
+    const duplicate = firstSeen.has(row.order_id);
+    firstSeen.add(row.order_id);
+    const isValid = !duplicate && ["completed", "cancelled"].includes(row.status) && wholeNumber(row.amount_vnd) > 0;
+    return {status: isValid ? "" : "fail", details: `${row.order_id} · ${row.branch_id} · ${vnd(Number(row.amount_vnd))} · ${duplicate ? "ID TRÙNG" : row.status}`};
+  }
+  if ("received_ict" in row) return {status: row.received_ict > cutoff ? "waiting" : "", details: `${row.file} · kỳ vọng ${row.expected_count} dòng · ${row.received_ict} ICT`};
+  if ("total_vnd" in row) return {status: "", details: `${row.branch_id} · tổng ERP ${vnd(Number(row.total_vnd))}`};
+  return {status: "", details: `${row.branch_id} · vùng ${row.region}`};
+}
+
+// Các CSV đi kèm dùng các trường đơn giản, không có dấu phẩy hay xuống dòng bên trong giá trị.
+function parseFixture(csv) {
+  const [header, ...lines] = csv.trimEnd().split(/\r?\n/);
+  const fields = header.split(",");
+  const rows = lines.map(line => Object.fromEntries(line.split(",").map((value, index) => [fields[index], value])));
+  return {fields, rows};
+}
+
+function wholeNumber(value) {
+  return /^\d+$/.test(value ?? "") && Number.isSafeInteger(Number(value)) ? Number(value) : NaN;
+}
+
+function applyScenario(table, file, scenario) {
+  if (scenario === "mismatch" && file.key === "POS-S") {
+    const row = table.rows.find(record => record.order_id === "TX004");
+    row.amount_vnd = String(Number(row.amount_vnd) + delta);
+  }
+  if (scenario === "late" && file.key === "CTRL") {
+    table.rows.find(record => record.file === "erp_daily_totals.csv").received_ict = "06:12";
+  }
+}
+
+function validate(tables) {
+  const pos = files.filter(file => file.key.startsWith("POS")).flatMap(file => tables[file.key]?.rows ?? []);
+  const erp = tables.ERP?.rows ?? [];
+  const master = tables.MASTER?.rows ?? [];
+  const control = tables.CTRL?.rows ?? [];
+  const ids = pos.map(row => row.order_id);
+  const branches = master.map(row => row.branch_id);
+  const registered = new Set(branches);
+  const unknown = [...new Set([...pos, ...erp].map(row => row.branch_id).filter(id => !registered.has(id)))];
+  const amounts = pos.length > 0 && erp.length > 0 && pos.every(row => wholeNumber(row.amount_vnd) > 0) && erp.every(row => wholeNumber(row.total_vnd) >= 0);
+  const posTotals = new Map();
+  const erpTotals = new Map();
+  for (const row of pos) {
+    if (row.status === "completed") posTotals.set(row.branch_id, (posTotals.get(row.branch_id) ?? 0) + wholeNumber(row.amount_vnd));
+  }
+  for (const row of erp) erpTotals.set(row.branch_id, wholeNumber(row.total_vnd));
+  const comparable = amounts && files.filter(file => file.key !== "CTRL").every(file => tables[file.key]);
+  const union = [...new Set([...posTotals.keys(), ...erpTotals.keys()])].sort();
+  const reconciliation = comparable ? union.map(branch => {
+    const pos = posTotals.get(branch) ?? 0;
+    const erp = erpTotals.get(branch) ?? 0;
+    return {branch, pos, erp, difference: pos - erp};
+  }) : [];
+  const variance = comparable ? reconciliation.reduce((sum, row) => sum + Math.abs(row.difference), 0) : null;
+  const mismatches = reconciliation.filter(row => row.difference || !posTotals.has(row.branch) || !erpTotals.has(row.branch));
+  const counts = new Map(control.map(row => [row.file, row]));
+  const feeds = files.filter(file => file.key !== "CTRL");
+  const incomplete = feeds.filter(file => !tables[file.key] || tables[file.key].rows.length !== wholeNumber(counts.get(file.name)?.expected_count));
+  const timing = feeds.filter(file => {
+    const entry = counts.get(file.name);
+    return !tables[file.key] || entry?.business_date !== businessDate || !/^([01]\d|2[0-3]):[0-5]\d$/.test(entry?.received_ict ?? "") || entry.received_ict > cutoff;
+  });
+  const checks = [
+    [files.every(file => !tables[file.key] || file.fields.every(name => tables[file.key].fields.includes(name))), "Cột bắt buộc trên các file nhận được"],
+    [ids.length > 0 && ids.every(Boolean) && new Set(ids).size === ids.length, `${ids.length} dòng POS · ${new Set(ids).size} ID phân biệt`],
+    [pos.length > 0 && pos.every(row => ["completed", "cancelled"].includes(row.status)), "POS chỉ có completed hoặc cancelled"],
+    [amounts, "POS > 0 · ERP ≥ 0 · số nguyên VND"],
+    [branches.length > 0 && branches.every(Boolean) && registered.size === branches.length && !unknown.length,
+      unknown.length ? `Mã ngoài danh mục: ${unknown.join(", ")}` : `${registered.size} mã trong Branch Master`],
+    [comparable && erpTotals.size === erp.length && !mismatches.length,
+      comparable ? `${reconciliation.length} chi nhánh · lệch tuyệt đối ${vnd(variance)}` : "Thiếu nguồn hoặc số tiền không hợp lệ. Chưa đủ dữ liệu để đối soát."],
+    [control.length === feeds.length && counts.size === feeds.length && !incomplete.length,
+      incomplete.length ? `Thiếu file hoặc lệch số dòng: ${incomplete.map(file => file.label).join(", ")}` : "8 nguồn khớp số dòng khai báo trong Batch Control"],
+    [timing.length === 0,
+      timing.length ? timing.map(file => `${file.label}: ${tables[file.key] ? counts.get(file.name)?.received_ict ?? "chưa có giờ" : "chưa nhận"}`).join(" · ") : `8 nguồn đúng ngày nghiệp vụ và đến trước hoặc đúng ${cutoff} ICT (giờ mẫu)`],
+  ].map(([pass, detail], index) => ({name: ruleNames[index], pass: Boolean(pass), detail}));
+  return {checks, reconciliation, variance, mismatches, incomplete, timing, pass: checks.every(check => check.pass)};
+}
+
+async function scanFiles(scenario, pace) {
+  const tables = {};
+  async function processFile(file) {
+    if (scenario === "missing" && file.key === "POS-N") {
+      fileState(file, "MISSING", "fail");
+      appendEvents(file.key, [`Thiếu file ${file.name} trong kịch bản.`], "fail");
+      await sleep(pace.file);
+      return;
+    }
+    fileState(file, "READING", "active");
+    appendEvents(file.key, [`Đọc ${file.name}`], "running");
+    const table = parseFixture(scenario === "external" && file.key === "POS-N" ? externalCSV : fixtures[file.name]);
+    applyScenario(table, file, scenario);
+    tables[file.key] = table;
+    await sleep(pace.file);
+    for (let start = 0; start < table.rows.length; start += pace.chunk) {
+      const slice = table.rows.slice(start, start + pace.chunk);
+      appendEvents(file.key, slice.map(row => recordEvent(file, row)), "record");
+      scanned += slice.length;
+      fileState(file, `${start + slice.length}/${table.rows.length}`, "active");
+      updateCounts();
+      await sleep(pace.tick);
+    }
+    read += 1;
+    updateCounts();
+    fileState(file, `${table.rows.length} ✓`, "pass");
+  }
+  await Promise.all(files.slice(0,2).map(processFile));
+  await Promise.all(files.slice(2).map(processFile));
+  return tables;
+}
+
+async function showRuleResults(report, pace, tables) {
+  let passed = 0;
+  for (const [index, check] of report.checks.entries()) {
+    showGateInputs(index, tables);
+    const row = byId(`check-${index}`);
+    const marker = row.querySelector("b");
+    row.classList.add("active");
+    marker.textContent = "RUN";
+    await sleep(pace.rule);
+    row.classList.remove("active");
+    marker.className = check.pass ? "pass" : "fail";
+    marker.textContent = check.pass ? "PASS" : "FAIL";
+    if (index === 7 && !check.pass) {
+      for (const file of report.timing) {
+        if (tables[file.key]) {
+          fileState(file, "SLA FAIL", "fail");
+          nodeState(file.key, "fail", "SAI SLA");
+        }
+      }
+    }
+    passed += Number(check.pass);
+    byId("rule-count").innerHTML = `${passed} <small>/ ${ruleNames.length}</small>`;
+    appendEvents("DQ", [`${check.pass ? "PASS" : "FAIL"} · ${check.name} · ${check.detail}`], marker.className);
+  }
+}
+
+function setControls() {
+  byId("run").disabled = running;
+  byId("scenario").disabled = running;
+  byId("pace").disabled = running;
+  byId("approve").disabled = running || approved || !latest?.pass;
+  byId("approve").classList.toggle("ready", !byId("approve").disabled);
+  byId("external-box").hidden = running || !(attemptedScenario === "missing" || attemptedScenario === "external") || latest?.pass;
+  byId("retry").disabled = running || !latest || latest.pass || attemptedScenario === "clean";
+}
+
+function incidentFor(report) {
+  if (report.incomplete.length) return {id: "INC-01", owner: "Data Engineering", summary: `Thiếu file hoặc lệch số dòng: ${report.incomplete.map(file => file.label).join(", ")}.`};
+  if (report.timing.length) return {id: "INC-01", owner: "Source Operations", summary: `Nguồn đến trễ hoặc sai ngày: ${report.timing.map(file => file.label).join(", ")}.`};
+  if (report.mismatches.length) return {id: "INC-01", owner: "Data Engineering", summary: `${report.mismatches.map(row => row.branch).join(", ")} lệch ${vnd(report.variance)}. Báo cáo doanh thu bị giữ.`};
+  return {id: "INC-01", owner: "Data Quality", summary: "Quality Gate phát hiện quy tắc bắt buộc chưa đạt."};
+}
+
+async function runBatch(scenario, recovery = false) {
+  if (running) return;
+  running = true;
+  byId("owner").textContent = recovery && history.at(-1)?.incident ? history.at(-1).incident.owner : "—";
+  byId("owner-note").textContent = recovery ? "Đang kiểm tra lại" : "Đang đánh giá";
+  approved = false;
+  latest = null;
+  attemptedScenario = scenario;
+  activeRun = `RUN-${String(history.length + 1).padStart(2, "0")}`;
+  scanned = 0;
+  read = 0;
+  firstSeen.clear();
+  setControls();
+  renderFiles();
+  renderRules();
+  renderEvidence();
+  [...steps, "ba", ...files.map(file => file.key)].forEach(step => nodeState(step, ""));
+  byId("stream").replaceChildren();
+  byId("rule-count").innerHTML = "— <small>/ 8</small>";
+  byId("variance").textContent = "—";
+  updateCounts();
+  pill("source-summary", "9 FILE");
+  pill("run-status", activeRun, "running");
+  decision("ĐANG KIỂM TRA", "Hệ thống đang đọc nguồn và chạy kiểm tra tự động.", "running");
+  const pace = byId("pace").value === "fast"
+    ? {file: 40, tick: 30, chunk: 24, rule: 50}
+    : {file: 260, tick: 325, chunk: 4, rule: 310};
+  try {
+    nodeState("intake", "active");
+    appendEvents("INTAKE", [scenario === "external" ? "Nhận pos_north.csv từ máy và chạy lại toàn bộ batch." : recovery ? "Khôi phục bộ dữ liệu mẫu sạch và chạy lại. Lịch sử lỗi được giữ." : "DATA-101 · Kiểm batch doanh thu trước giờ công bố 07:00 ICT."], "running");
+    await sleep(pace.file);
+    nodeState("intake", "pass");
+    nodeState("ba", "active");
+    appendEvents("BA / PLAN", ["Áp dụng tiêu chí đã chốt: đủ nguồn, hạn 06:00 ICT, doanh thu completed khớp ERP."]);
+    await sleep(pace.file);
+    nodeState("ba", "pass");
+    nodeState("scan", "active");
+    const tables = await scanFiles(scenario, pace);
+    nodeState("scan", read === files.length ? "pass" : "fail");
+    if (read < files.length) pill("source-summary", `${read}/${files.length} FILE`, "fail");
+    nodeState("gate", "active");
+    const report = validate(tables);
+    await showRuleResults(report, pace, tables);
+    if (report.variance !== null) byId("variance").textContent = vnd(report.variance);
+    nodeState("gate", report.pass ? "pass" : "fail", report.variance > 0 ? "LỆCH TIỀN" : "");
+    nodeState("triage", "active");
+    await sleep(pace.rule);
+    const incident = report.pass ? null : incidentFor(report);
+    const priorOwner = recovery ? history.at(-1)?.incident?.owner : "";
+    byId("owner").textContent = incident?.owner || priorOwner || "—";
+    byId("owner-note").textContent = incident ? "Owner đề xuất · Sự cố mở" : priorOwner ? "Đã xử lý · Batch đạt" : "Không có sự cố mở";
+    history.push({id: activeRun, run: scenario, scanned, report, incident, recovery, approval: ""});
+    latest = report;
+    if (incident) {
+      nodeState("triage", "pass");
+      nodeState("publish", "fail");
+      pill("run-status", `${activeRun} · FAIL`, "fail");
+      decision("NO-GO", `${incident.id} · ${incident.summary} Owner đề xuất: ${incident.owner}.`, "fail");
+      appendEvents("TRIAGE", [`${incident.id} · ${incident.summary} Owner đề xuất: ${incident.owner}.`], "fail");
+    } else {
+      nodeState("triage", "pass");
+      nodeState("publish", "waiting");
+      pill("run-status", `${activeRun} · PASS`, "pass");
+      decision("CHỜ QA", "8/8 rule đạt. QA cần xác nhận trước khi chuyển sang GO.", "waiting");
+      if (recovery) appendEvents("TRIAGE", ["INC-01 · Batch khôi phục vượt qua Quality Gate."], "pass");
+      appendEvents("QA", ["Quality Gate PASS · Đang chờ QA duyệt mô phỏng."], "waiting");
+    }
+  } catch (error) {
+    for (const [step, state] of graphState) if (state === "active") nodeState(step, "fail");
+    graphRoutes.forEach(edge => edge.classList.remove("live"));
+    decision("NO-GO", "Lỗi thực thi. Xem nhật ký và chạy lại batch.", "fail");
+    pill("run-status", "EXECUTION ERROR", "fail");
+    nodeState("publish", "fail");
+    appendEvents("SYSTEM", [error.message], "fail");
+  } finally {
+    running = false;
+    setControls();
+    renderEvidence();
+  }
+}
+
+function table(headers, rows) {
+  return `<div class="table-wrap"><table><thead><tr>${headers.map(header => `<th scope="col">${escape(header)}</th>`).join("")}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(cell => {
+    const {value, style} = typeof cell === "object" ? cell : {value: cell, style: ""};
+    return `<td class="${style}">${escape(value)}</td>`;
+  }).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+
+function renderEvidence() {
+  const empty = '<div class="empty">Kết quả sẽ xuất hiện sau khi chạy batch.</div>';
+  byId("history").innerHTML = history.length ? table(["Lần chạy", "Bản ghi", "Gate", "Chênh lệch", "Công bố"],
+    [...history].reverse().map(run => [
+      run.id, format(run.scanned), {value: run.report.pass ? "PASS" : "FAIL", style: run.report.pass ? "pass" : "fail"},
+      run.report.variance === null ? "—" : vnd(run.report.variance), run.approval ? "GO · QA mô phỏng" : run.report.pass ? "Chờ QA" : "NO-GO",
+    ])) : empty;
+  const measured = history.filter(run => run.report.variance !== null).slice(-6);
+  const peak = Math.max(1, ...measured.map(run => run.report.variance));
+  byId("variance-chart").innerHTML = measured.length
+    ? `<div class="chart-title">CHÊNH LỆCH QUA CÁC LẦN CHẠY</div>${measured.map(run =>
+      `<div class="chart-row"><span>${run.id}</span><div class="chart-track"><i class="${run.report.variance ? "has-variance" : ""}" style="width:${run.report.variance / peak * 100}%"></i></div><span>${vnd(run.report.variance)}</span></div>`).join("")}`
+    : "";
+  byId("audit").innerHTML = latest ? table(["Quy tắc", "Kết quả", "Bằng chứng"],
+    latest.checks.map(check => [check.name, {value: check.pass ? "PASS" : "FAIL", style: check.pass ? "pass" : "fail"}, check.detail])) : empty;
+  byId("reconciliation").innerHTML = latest?.reconciliation.length
+    ? table(["Chi nhánh", "POS", "ERP", "Chênh lệch POS − ERP"], [...latest.reconciliation]
+      .sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference))
+      .map(row => [row.branch, {value: format(row.pos), style: "num"}, {value: format(row.erp), style: "num"},
+        {value: format(row.difference), style: `num ${row.difference ? "fail" : "pass"}`}]))
+    : latest ? '<div class="empty">Chưa có đủ dữ liệu để đối soát theo chi nhánh.</div>' : empty;
+}
+
+function approve() {
+  if (running || approved || !latest?.pass) return;
+  approved = true;
+  history.at(-1).approval = new Date().toISOString();
+  nodeState("publish", "pass");
+  pill("run-status", `${activeRun} · GO`, "pass");
+  decision("GO · QA ĐÃ DUYỆT", "Đã ghi phê duyệt mô phỏng cho lần chạy đạt gate.", "pass");
+  appendEvents("QA", ["GO · Người trình diễn đã xác nhận phê duyệt mô phỏng."], "pass");
+  setControls();
+  renderEvidence();
+}
+
+function downloadAudit() {
+  const cell = value => `"${String(value).replaceAll('"', '""')}"`;
+  const rows = events.map(event => [event.run, event.at, event.source, event.status, event.details].map(cell).join(","));
+  const url = URL.createObjectURL(new Blob(["\ufeffrun,utc,source,status,detail\r\n", rows.join("\r\n")], {type: "text/csv;charset=utf-8"}));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "ADCT_V3_Audit.csv";
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+let externalCSV = "";
+byId("external-file").addEventListener("change", async event => {
+  const input = event.target;
+  const file = input.files[0];
+  if (!file || running) return;
+  input.value = "";
+  if (file.name !== "pos_north.csv") { decision("CHỜ FILE", "Chọn đúng pos_north.csv.", "waiting"); return; }
+  externalCSV = (await file.text()).replace(/^\uFEFF/, "");
+  if (!running) await runBatch("external", true);
+});
+renderFiles();
+renderRules();
+renderEvidence();
+decision("CHƯA CHẠY", "Chọn kịch bản rồi chạy batch để bắt đầu.");
+byId("stream").append(element("div", "log-empty", "Sự kiện sẽ hiện ở đây khi batch chạy."));
+document.querySelectorAll("[data-page]").forEach(button => button.addEventListener("click", () => choosePage(button.dataset.page)));
+byId("run").addEventListener("click", () => runBatch(byId("scenario").value));
+byId("retry").addEventListener("click", () => {
+  byId("scenario").value = "clean";
+  runBatch("clean", true);
+});
+byId("approve").addEventListener("click", approve);
+byId("export").addEventListener("click", downloadAudit);
+byId("follow").addEventListener("click", () => {
+  follow = !follow;
+  byId("follow").setAttribute("aria-pressed", follow);
+  byId("follow").lastChild.textContent = follow ? " Tự cuộn" : " Dừng cuộn";
+  if (follow) byId("stream").scrollTop = byId("stream").scrollHeight;
+});
+</script>
+<script>(() => {
+  const el = id => document.getElementById(id);
+  const lanes = {
+    daily: {title:"Báo cáo doanh thu", stages:["Nhận nguồn","Đối soát","QA duyệt","Bàn giao"], target:"Hôm nay · 07:00 ICT"},
+    feature: {title:"Tính năng hoàn tiền một phần", stages:["Chốt phạm vi","Code review","CI đạt","UAT duyệt","Release"], target:"Sprint 12 · Mốc phát hành"}
+  };
+  let stream = [], cursor = 0, timer, generation = 0;
+  const seen = new Set();
+  const lane = () => el("dm-lane").value;
+  const demo = {
+    daily:[[1,"done","Data Engineering","Kho nguồn","Đã nhận đủ dữ liệu"],[2,"blocked","Data Engineering","DQ job","LC002 lệch 25.000 ₫"],[2,"done","Data Engineering","DQ rerun","Đã đối soát lại"],[3,"done","QA Lead","Approval","QA xác nhận"],[4,"done","BI","Publish job","Đã phát hành báo cáo"]],
+    feature:[[1,"done","Product Owner","Ticket F-27","Chốt quy tắc hoàn một phần"],[2,"active","Engineer","PR #17","Đang chờ review"],[2,"done","Tech Lead","PR #17","Đã duyệt PR"],[3,"blocked","Engineer","CI #81","Test hoàn hai lần cùng giao dịch bị lỗi"],[3,"done","Engineer","CI #82","Đã sửa và kiểm thử lại"],[4,"done","Finance Owner","UAT #12","Đã nghiệm thu"],[5,"done","Release Owner","Deploy #33","Đã triển khai"]]
+  };
+  function render() {
+    const key=lane(), config=lanes[key], rows=stream.filter(e=>e.lane===key);
+    el("dm-title").textContent=config.title;
+    el("dm-target").textContent=el("dm-mode").value==="demo"?config.target:"Mốc theo cấu hình của nguồn sự kiện";
+    const last=new Map();
+    for(const e of rows)last.set(e.stage,e);
+    const done=[...last.values()].filter(e=>e.status==="done").length;
+    el("dm-summary").textContent=done+" / "+config.stages.length+" mốc đạt";
+    const blocked=[...last.values()].filter(e=>e.status==="blocked");
+    el("dm-alert").textContent=blocked.length?blocked.map(e=>"CẢNH BÁO · "+config.stages[e.stage-1]+" · "+e.owner+" · "+e.detail).join(" | "):rows.length?"Chưa có blocker mở trong các sự kiện đã nhận.":"Chờ sự kiện đầu tiên.";
+    el("dm-alert").className=blocked.length?"fail":"";
+    function line(parent,columns) {
+      const row=document.createElement("tr");
+      for(const value of columns){const cell=document.createElement("td");cell.textContent=value;row.append(cell);}
+      parent.append(row);
+    }
+    const stages=el("dm-stages"),log=el("dm-events");stages.replaceChildren();log.replaceChildren();
+    config.stages.forEach((name,i)=>{const e=last.get(i+1);line(stages,[name,e?({active:"Đang làm",blocked:"Bị chặn",done:"Đã đạt"})[e.status]:"Chờ",e?.owner||"—",e?.source||"—"]);});
+    for(const e of rows.slice(-20).reverse())line(log,[new Date(e.at).toLocaleString("vi-VN",{timeZone:"Asia/Ho_Chi_Minh"}),e.source,e.detail]);
+  }
+  function receive(e){
+    if(seen.has(e.id))return;
+    seen.add(e.id);stream.push(e);
+  }
+  function reset(){clearTimeout(timer);generation++;stream=[];cursor=0;seen.clear();render();}
+  function start(){
+    reset(); const gen=generation, key=lane();
+    if(el("dm-mode").value==="demo"){
+      let i=0;el("dm-connection").textContent="Đang phát sự kiện mẫu";
+      function tick(){if(gen!==generation)return;const [stage,status,owner,source,detail]=demo[key][i];
+        receive({id:"sample-"+i,lane:key,stage,status,owner,source,detail,at:new Date().toISOString()});render();
+        if(++i<demo[key].length)timer=setTimeout(tick,status==="blocked"?5000:2000);
+        else el("dm-connection").textContent="Đã phát hết sự kiện mẫu";}
+      tick();return;
+    }
+    if(!["http:","https:"].includes(location.protocol)){el("dm-connection").textContent="Mở dashboard bằng máy chủ local trong bộ ZIP để nhận sự kiện.";return;}
+    async function poll(){
+      try{const r=await fetch("/api/events?after="+cursor,{cache:"no-store"});if(!r.ok)throw Error();
+        const data=await r.json();if(gen!==generation)return;
+        for(const e of data.events)receive(e);cursor=data.cursor;render();
+        el("dm-connection").textContent="Đã kết nối · kiểm tra mỗi 2 giây";
+      }catch{if(gen===generation)el("dm-connection").textContent="Chưa kết nối được nguồn sự kiện · đang thử lại";}
+      if(gen===generation)timer=setTimeout(poll,2000);
+    }poll();
+  }
+  el("dm-start").onclick=start;
+  el("dm-lane").onchange=el("dm-mode").onchange=()=>{reset();el("dm-connection").textContent="Sẵn sàng";};
+  render();
+})();
+</script></body>
+</html>
